@@ -362,7 +362,7 @@ font-family:inherit; font-size:14px; cursor:pointer;
       <div class="h-sub">公的ガイドライン準拠 診断支援</div>
     </div>
     <div class="h-space"></div>
-    <button class="btn-up" id="btnUp">🔄 更新確認</button>
+    <button class="btn-up" id="btnUp">📋 ガイドライン確認</button>
   </header>
 
   <!-- 更新通知 -->
@@ -375,52 +375,41 @@ font-family:inherit; font-size:14px; cursor:pointer;
 
   <div class="up-panel" id="upPanel">
     <div class="up-ttl">📋 ガイドライン更新チェック</div>
-    <div class="tabs">
-      <button class="tab-btn sel" onclick="selTab('auto')">① 自動チェック</button>
-      <button class="tab-btn" onclick="selTab('manual')">② Claude手動確認</button>
-      <button class="tab-btn" onclick="selTab('paste')">③ 貼り付け</button>
-      <button class="tab-btn" onclick="selTab('hist')">④ 履歴</button>
-    </div>
+    <p class="note" style="margin-bottom:12px">
+      ボタンを押すと確認用プロンプトが<strong style="color:#e8eaf0">自動コピー</strong>され、Claudeのチャット画面が新しいタブで開きます。そのまま貼り付けて送信するだけでガイドラインの最新版を確認できます。
+    </p>
 
 ```
-<!-- 自動チェック -->
-<div class="tab-pane sel" id="pane-auto">
-  <div id="gl-list"></div>
-  <button class="btn-gold" id="btnAutoCheck" onclick="runAutoCheck()">🔍 自動チェック開始</button>
-  <div class="spinner-wrap" id="spin-area" style="display:none">
-    <div class="spinner"></div>
-    <div style="font-size:12px;color:#6b7280" id="spin-msg">確認中…</div>
-  </div>
-  <div id="auto-result" style="display:none">
-    <div id="result-rows"></div>
-    <div id="result-banner"></div>
-    <button style="margin-top:8px;width:100%;padding:9px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#6b7280;font-family:inherit;font-size:12px;cursor:pointer" onclick="resetCheck()">再チェックする</button>
-  </div>
-</div>
+<!-- 監視対象一覧 -->
+<div id="gl-list" style="margin-bottom:12px"></div>
 
-<!-- Claude手動確認 -->
-<div class="tab-pane" id="pane-manual">
-  <p class="note">自動チェックが失敗した場合にご利用ください。以下のプロンプトをコピーして<strong style="color:#e8eaf0">Claudeのチャット</strong>に貼り付けて送信すると、Claudeが最新ガイドラインを検索します。返ってきたJSONを「③ 貼り付け」タブに貼り付けてください。</p>
-  <div class="prompt-box" id="prompt-box"></div>
-  <button class="btn-gold" onclick="copyPrompt()">📋 プロンプトをコピーする</button>
-  <p style="font-size:11px;color:#6b7280;text-align:center;margin-top:6px">コピー → Claudeに貼り付けて送信 → 返ってきたJSONを③へ</p>
-</div>
+<!-- メインボタン -->
+<button class="btn-gold" id="btnCopyOpen" onclick="copyAndOpen()">
+  📋 プロンプトをコピーして Claude で確認する
+</button>
+<p id="copy-status" style="font-size:11px;color:#4cd964;text-align:center;margin-top:6px;min-height:16px"></p>
 
-<!-- 貼り付け -->
-<div class="tab-pane" id="pane-paste">
-  <p class="note">ClaudeからのJSONをそのまま貼り付けてください。</p>
+<!-- 結果貼り付け -->
+<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)">
+  <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:#c9a84c;text-transform:uppercase;margin-bottom:8px">
+    Claudeからの返答を貼り付けて反映
+  </div>
+  <p class="note" style="margin-bottom:8px">ClaudeからのJSONをそのまま貼り付けてください。</p>
   <textarea class="paste-ta" id="paste-ta" placeholder='{"results":[...]}'></textarea>
   <p class="err-txt" id="paste-err"></p>
   <button class="btn-red" id="btnApply" disabled onclick="applyPaste()">✅ 結果を反映する</button>
 </div>
 
 <!-- 履歴 -->
-<div class="tab-pane" id="pane-hist">
-  <div id="hist-list"><p style="font-size:12px;color:#6b7280;text-align:center;padding:16px 0">チェック履歴がありません</p></div>
+<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)">
+  <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:#c9a84c;text-transform:uppercase;margin-bottom:8px">チェック履歴</div>
+  <div id="hist-list"><p style="font-size:12px;color:#6b7280;text-align:center;padding:10px 0">チェック履歴がありません</p></div>
 </div>
 ```
 
   </div>
+
+  <!-- 症状入力 -->
 
   <!-- 症状入力 -->
 
@@ -500,11 +489,7 @@ var DB = [
 
 var CHIPS_LIST = ["胸の痛み・圧迫感","胸のしめつけ","左腕のしびれ","動悸・不整脈","息切れ","呼吸困難","急な冷や汗","めまい・ふらつき","顔面蒼白","足のむくみ","失神・意識消失","頭痛","頸部・顎の痛み","背中の痛み","吐き気"];
 var EMG_KW = ["失神・意識消失","顔面蒼白","急な冷や汗","呼吸困難"];
-var PROXIES = [
-  function(u){ return "https://api.allorigins.win/raw?url="+encodeURIComponent(u); },
-  function(u){ return "https://corsproxy.io/?"+encodeURIComponent(u); },
-  function(u){ return "https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(u); }
-];
+
 
 var selChips = {};
 var history  = [];
@@ -515,7 +500,6 @@ var history  = [];
 window.addEventListener('DOMContentLoaded', function(){
   buildChips();
   buildGlList();
-  buildPrompt();
   document.getElementById('btnAnalyze').addEventListener('click', doAnalyze);
   document.getElementById('btnBack').addEventListener('click', goBack);
   document.getElementById('btnUp').addEventListener('click', togglePanel);
@@ -540,6 +524,7 @@ function buildChips(){
 
 function buildGlList(){
   var el = document.getElementById('gl-list');
+  if(!el) return;
   el.innerHTML = '';
   GL.forEach(function(g){
     el.innerHTML += '<div class="gl-row">'
@@ -581,121 +566,73 @@ function selTab(t){
 }
 
 // ════════════════════════════
-// 自動チェック
+// コピー＋Claude画面を開く
 // ════════════════════════════
-async function runAutoCheck(){
-  document.getElementById('btnAutoCheck').style.display = 'none';
-  document.getElementById('spin-area').style.display = 'block';
-  document.getElementById('auto-result').style.display = 'none';
+function copyAndOpen(){
+  var txt = buildPromptText();
+  var status = document.getElementById('copy-status');
 
-  // URLごとにまとめて並列フェッチ
-  var urlMap = {};
-  GL.forEach(function(g){ if(!urlMap[g.url]) urlMap[g.url]=[]; urlMap[g.url].push(g); });
-
-  document.getElementById('spin-msg').textContent = '各学会サイトを並列確認中…（最大15秒）';
-
-  var results = [];
-  var fetchTasks = Object.keys(urlMap).map(function(url){
-    return fetchWithProxy(url).then(function(html){
-      urlMap[url].forEach(function(g){
-        if(!html){ results.push({g:g, status:'error', msg:'アクセスできませんでした'}); return; }
-        var r = extractYear(html, g);
-        results.push({g:g, status:r.status, msg:r.msg, latestYear:r.latestYear});
-        var b = document.getElementById('b-'+g.id);
-        if(b){
-          b.className = 'badge '+(r.status==='ok'?'badge-ok':r.status==='updated'?'badge-upd':r.status==='unknown'?'badge-wait':'badge-err');
-          b.textContent = r.status==='ok'?'✅ 最新':r.status==='updated'?'🟡 更新あり':r.status==='unknown'?'❓ 不明':'⚠️ エラー';
-        }
-      });
-    }).catch(function(){
-      urlMap[url].forEach(function(g){
-        results.push({g:g, status:'error', msg:'アクセスできませんでした'});
-      });
-    });
-  });
-  await Promise.all(fetchTasks);
-
-  showAutoResult(results);
-  saveHist(results);
-  document.getElementById('spin-area').style.display = 'none';
-  document.getElementById('auto-result').style.display = 'block';
-}
-
-async function fetchWithTimeout(url, ms){
-  var controller = new AbortController();
-  var tid = setTimeout(function(){ controller.abort(); }, ms);
-  try{
-    var res = await fetch(url, {signal: controller.signal});
-    clearTimeout(tid);
-    return res.ok ? await res.text() : null;
-  }catch(e){
-    clearTimeout(tid);
-    return null;
-  }
-}
-
-async function fetchWithProxy(url){
-  for(var i=0;i<PROXIES.length;i++){
-    var html = await fetchWithTimeout(PROXIES[i](url), 8000);
-    if(html) return html;
-  }
-  return null;
-}
-
-function extractYear(html, g){
-  var idx = html.indexOf(g.pat);
-  if(idx===-1) return {status:'unknown', msg:'ページ内でガイドライン名が見つかりませんでした', latestYear:null};
-  var ctx = html.slice(Math.max(0,idx-100), idx+500);
-  var ms = ctx.match(/20\d{2}/g);
-  if(!ms) return {status:'unknown', msg:'年号を特定できませんでした', latestYear:null};
-  var years = ms.map(Number).filter(function(y){ return y>=2010&&y<=2030; });
-  if(!years.length) return {status:'unknown', msg:'年号を特定できませんでした', latestYear:null};
-  var latest = Math.max.apply(null, years);
-  if(latest > g.year) return {status:'updated', latestYear:latest, msg:'新版を検出: '+latest+'年版（記録: '+g.year+'年版）'};
-  return {status:'ok', latestYear:latest, msg:'最新版（'+latest+'年版）'};
-}
-
-function showAutoResult(results){
-  var rows = '';
-  var hasUpd=false, hasErr=false;
-  results.forEach(function(r){
-    var bc = r.status==='ok'?'badge-ok':r.status==='updated'?'badge-upd':r.status==='unknown'?'badge-wait':'badge-err';
-    var bt = r.status==='ok'?'✅ 最新':r.status==='updated'?'🟡 更新あり':r.status==='unknown'?'❓ 不明':'⚠️ エラー';
-    rows += '<div class="gl-row"><div><div class="gl-name">'+r.g.name+'</div><div class="gl-meta">'+r.msg+'</div></div><span class="badge '+bc+'">'+bt+'</span></div>';
-    if(r.status==='updated') hasUpd=true;
-    if(r.status==='error') hasErr=true;
-  });
-  document.getElementById('result-rows').innerHTML = rows;
-  var b = document.getElementById('result-banner');
-  if(hasUpd){
-    b.className='result-banner rb-upd';
-    b.textContent='🟡 更新が見つかりました。各学会の公式サイトでご確認ください。';
-    document.getElementById('noticeMsg').textContent='ガイドライン更新あり — タップして確認';
-    document.getElementById('noticeBar').classList.add('show');
-  } else if(hasErr){
-    b.className='result-banner rb-err';
-    b.textContent='⚠️ 一部アクセスできませんでした。「② Claude手動確認」タブをお使いください。';
+  // クリップボードへコピー
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(function(){
+      status.textContent = '✅ コピーしました！Claudeに貼り付けて送信してください。';
+    }).catch(function(){ fallbackCopy(txt, status); });
   } else {
-    b.className='result-banner rb-ok';
-    b.textContent='✅ すべてのガイドラインは最新版です。';
+    fallbackCopy(txt, status);
   }
+
+  // Claudeのチャット画面を新タブで開く
+  window.open('https://claude.ai/new', '_blank');
 }
 
-function resetCheck(){
-  document.getElementById('auto-result').style.display='none';
-  document.getElementById('btnAutoCheck').style.display='block';
-  buildGlList();
+function fallbackCopy(txt, status){
+  var ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try{
+    document.execCommand('copy');
+    if(status) status.textContent = '✅ コピーしました！Claudeに貼り付けて送信してください。';
+  }catch(e){
+    if(status) status.textContent = '⚠️ 手動でコピーしてください。';
+  }
+  document.body.removeChild(ta);
 }
+
+function buildPromptText(){
+  var list = GL.map(function(g){
+    return '・'+g.name+'（'+g.org+'、現在アプリに記録されている年版: '+g.year+'年）';
+  }).join('\n');
+  var tmpl = GL.map(function(g){
+    return '{"id":"'+g.id+'","latest_year":'+g.year+',"updated":false,"summary":"変更なし"}';
+  }).join(',');
+  return '以下の医療ガイドラインについて、各学会の公式Webサイトを検索し最新版の年を確認してください。\n\n'
+    + list + '\n\n'
+    + '記録の年より新しい版がある場合はupdated:trueにしてください。\n'
+    + '以下のJSON形式のみで回答してください（前置き・マークダウン不要）：\n\n'
+    + '{"results":['+tmpl+']}';
+}
+
+// ════════════════════════════
+// （旧）自動チェック ← 削除済み
+// ════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
 
 // ════════════════════════════
 // コピー
 // ════════════════════════════
-function copyPrompt(){
-  var txt = document.getElementById('prompt-box').textContent;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(txt).then(function(){ alert('コピーしました！\nClaudeのチャットに貼り付けて送信してください。'); }).catch(function(){ fallbackCopy(txt); });
-  } else { fallbackCopy(txt); }
-}
+
 function fallbackCopy(txt){
   var ta = document.createElement('textarea');
   ta.value = txt; document.body.appendChild(ta);

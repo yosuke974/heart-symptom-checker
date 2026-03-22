@@ -534,17 +534,6 @@ function buildGlList(){
   });
 }
 
-function buildPrompt(){
-  var list = GL.map(function(g){ return '・'+g.name+'（'+g.org+'、記録: '+g.year+'年版）'; }).join('\n');
-  var tmpl = GL.map(function(g){ return '{"id":"'+g.id+'","latest_year":'+g.year+',"updated":false,"summary":"変更なし"}'; }).join(',');
-  var txt = '以下の医療ガイドラインについて、各学会の公式Webサイトを検索し最新版の年を確認してください。\n\n'
-    + list + '\n\n'
-    + '記録の年より新しい版がある場合はupdated:trueにしてください。\n'
-    + '以下のJSON形式のみで回答してください（前置き・マークダウン不要）：\n\n'
-    + '{"results":['+tmpl+']}';
-  document.getElementById('prompt-box').textContent = txt;
-}
-
 // ════════════════════════════
 // パネル・タブ
 // ════════════════════════════
@@ -553,16 +542,6 @@ function togglePanel(){
   p.classList.toggle('open');
   document.getElementById('btnUp').style.background =
     p.classList.contains('open') ? 'rgba(201,168,76,0.22)' : 'rgba(201,168,76,0.1)';
-}
-
-function selTab(t){
-  var tabs = ['auto','manual','paste','hist'];
-  tabs.forEach(function(id){
-    document.getElementById('pane-'+id).classList.toggle('sel', id===t);
-  });
-  document.querySelectorAll('.tab-btn').forEach(function(b,i){
-    b.classList.toggle('sel', tabs[i]===t);
-  });
 }
 
 // ════════════════════════════
@@ -648,7 +627,29 @@ function applyPaste(){
   var raw = document.getElementById('paste-ta').value.trim();
   document.getElementById('paste-err').textContent='';
   try{
-    var m = raw.match(/\{[\s\S]*\}/);
+    // 全角・特殊引用符を半角に統一
+    var normalized = '';
+    for(var i=0;i<raw.length;i++){
+      var code = raw.charCodeAt(i);
+      // 全角引用符 “ ” ″ ＂ → "
+      if(code===0x201c||code===0x201d||code===0x2033||code===0xff02){
+        normalized+='"';
+      // 全角コロン ： → :
+      }else if(code===0xff1a){
+        normalized+=':';
+      // 全角カンマ ， → ,
+      }else if(code===0xff0c){
+        normalized+=',';
+      // 全角中括弧
+      }else if(code===0xff5b){
+        normalized+='{';
+      }else if(code===0xff5d){
+        normalized+='}';
+      }else{
+        normalized+=raw[i];
+      }
+    }
+    var m = normalized.match(/\{[\s\S]*\}/);
     if(!m) throw new Error('JSONが見つかりません');
     var data = JSON.parse(m[0]);
     if(!Array.isArray(data.results)) throw new Error('results配列が見つかりません');
@@ -656,18 +657,32 @@ function applyPaste(){
       var g = GL.find(function(x){ return x.id===r.id; })||{id:r.id,name:r.id,org:'',year:0};
       return {g:g, status:r.updated?'updated':'ok', latestYear:r.latest_year, msg:r.summary||''};
     });
-    showAutoResult(results);
+    showPasteResult(results);
     saveHist(results);
     document.getElementById('paste-ta').value='';
-    selTab('hist');
+    document.getElementById('paste-err').textContent='';
   }catch(e){
     document.getElementById('paste-err').textContent='エラー: '+e.message;
   }
 }
 
-// ════════════════════════════
-// 履歴
-// ════════════════════════════
+function showPasteResult(results){
+  var hasUpd=false;
+  results.forEach(function(r){
+    var b = document.getElementById('b-'+r.g.id);
+    if(b){
+      b.className='badge '+(r.status==='updated'?'badge-upd':'badge-ok');
+      b.textContent=r.status==='updated'?'🟡 更新あり':'✅ 最新';
+    }
+    if(r.status==='updated') hasUpd=true;
+  });
+  if(hasUpd){
+    document.getElementById('noticeMsg').textContent='ガイドライン更新あり — タップして確認';
+    document.getElementById('noticeBar').classList.add('show');
+  }
+}
+
+
 function saveHist(results){
   var now = new Date().toLocaleString('ja-JP');
   var upd = results.filter(function(r){ return r.status==='updated'; });

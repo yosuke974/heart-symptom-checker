@@ -481,7 +481,7 @@ var GL = [
   {id:"arr", name:"不整脈薬物治療ガイドライン",                   org:"日本循環器学会", year:2020, url:"https://www.j-circ.or.jp/guideline/guideline-series/", pat:"不整脈薬物"},
   {id:"hf",  name:"急性・慢性心不全診療ガイドライン",             org:"日本循環器学会", year:2017, url:"https://www.j-circ.or.jp/guideline/guideline-series/", pat:"心不全"},
   {id:"aod", name:"大動脈瘤・大動脈解離診療ガイドライン",         org:"日本循環器学会", year:2020, url:"https://www.j-circ.or.jp/guideline/guideline-series/", pat:"大動脈"},
-  {id:"htn", name:"高血圧治療ガイドライン",                       org:"日本高血圧学会", year:2019, url:"https://www.jpnsh.jp/guideline.html",                   pat:"高血圧治療"},
+  {id:"htn", name:"高血圧管理・治療ガイドライン",                  org:"日本高血圧学会", year:2025, url:"https://www.jpnsh.jp/guideline.html",                   pat:"高血圧"},
   {id:"pe",  name:"肺血栓塞栓症・深部静脈血栓症診療ガイドライン", org:"日本循環器学会", year:2017, url:"https://www.j-circ.or.jp/guideline/guideline-series/", pat:"肺血栓"},
   {id:"syn", name:"失神の診断・治療ガイドライン",                 org:"日本循環器学会", year:2012, url:"https://www.j-circ.or.jp/guideline/guideline-series/", pat:"失神"},
 ];
@@ -588,26 +588,32 @@ async function runAutoCheck(){
   document.getElementById('spin-area').style.display = 'block';
   document.getElementById('auto-result').style.display = 'none';
 
-  // URLごとにまとめてフェッチ
+  // URLごとにまとめて並列フェッチ
   var urlMap = {};
   GL.forEach(function(g){ if(!urlMap[g.url]) urlMap[g.url]=[]; urlMap[g.url].push(g); });
 
+  document.getElementById('spin-msg').textContent = '各学会サイトを並列確認中…（最大15秒）';
+
   var results = [];
-  for(var url in urlMap){
-    var gls = urlMap[url];
-    document.getElementById('spin-msg').textContent = gls[0].org + ' のサイトを確認中…';
-    var html = await fetchWithProxy(url);
-    gls.forEach(function(g){
-      if(!html){ results.push({g:g, status:'error', msg:'アクセスできませんでした'}); return; }
-      var r = extractYear(html, g);
-      results.push({g:g, status:r.status, msg:r.msg, latestYear:r.latestYear});
-      var b = document.getElementById('b-'+g.id);
-      if(b){
-        b.className = 'badge '+(r.status==='ok'?'badge-ok':r.status==='updated'?'badge-upd':r.status==='unknown'?'badge-wait':'badge-err');
-        b.textContent = r.status==='ok'?'✅ 最新':r.status==='updated'?'🟡 更新あり':r.status==='unknown'?'❓ 不明':'⚠️ エラー';
-      }
+  var fetchTasks = Object.keys(urlMap).map(function(url){
+    return fetchWithProxy(url).then(function(html){
+      urlMap[url].forEach(function(g){
+        if(!html){ results.push({g:g, status:'error', msg:'アクセスできませんでした'}); return; }
+        var r = extractYear(html, g);
+        results.push({g:g, status:r.status, msg:r.msg, latestYear:r.latestYear});
+        var b = document.getElementById('b-'+g.id);
+        if(b){
+          b.className = 'badge '+(r.status==='ok'?'badge-ok':r.status==='updated'?'badge-upd':r.status==='unknown'?'badge-wait':'badge-err');
+          b.textContent = r.status==='ok'?'✅ 最新':r.status==='updated'?'🟡 更新あり':r.status==='unknown'?'❓ 不明':'⚠️ エラー';
+        }
+      });
+    }).catch(function(){
+      urlMap[url].forEach(function(g){
+        results.push({g:g, status:'error', msg:'アクセスできませんでした'});
+      });
     });
-  }
+  });
+  await Promise.all(fetchTasks);
 
   showAutoResult(results);
   saveHist(results);
@@ -615,12 +621,23 @@ async function runAutoCheck(){
   document.getElementById('auto-result').style.display = 'block';
 }
 
+async function fetchWithTimeout(url, ms){
+  var controller = new AbortController();
+  var tid = setTimeout(function(){ controller.abort(); }, ms);
+  try{
+    var res = await fetch(url, {signal: controller.signal});
+    clearTimeout(tid);
+    return res.ok ? await res.text() : null;
+  }catch(e){
+    clearTimeout(tid);
+    return null;
+  }
+}
+
 async function fetchWithProxy(url){
   for(var i=0;i<PROXIES.length;i++){
-    try{
-      var res = await fetch(PROXIES[i](url));
-      if(res.ok) return await res.text();
-    }catch(e){}
+    var html = await fetchWithTimeout(PROXIES[i](url), 8000);
+    if(html) return html;
   }
   return null;
 }

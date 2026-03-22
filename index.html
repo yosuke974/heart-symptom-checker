@@ -5,109 +5,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>心臓・血管 症状チェッカー</title>
+<title>総合症状チェッカー｜公的ガイドライン準拠</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#0a0e1a;color:#e8eaf0;font-family:'Noto Sans JP',sans-serif;min-height:100vh}
 .app{max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
-.app::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(232,69,69,0.12) 0%,transparent 65%);pointer-events:none}
+.app::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(100,120,220,0.1) 0%,transparent 65%);pointer-events:none}
 
-/* Header */
-.hdr{position:relative;z-index:1;padding:16px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0}
-.hdr-icon{width:38px;height:38px;background:linear-gradient(135deg,#e84545,#c0392b);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(232,69,69,0.4)}
-.hdr-title{font-size:14px;font-weight:700}
+/* ── Header ── */
+.hdr{position:relative;z-index:1;padding:14px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0}
+.hdr-icon{width:38px;height:38px;background:linear-gradient(135deg,#4a7cf7,#2855c8);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(74,124,247,0.4)}
+.hdr-title{font-size:15px;font-weight:700}
 .hdr-sub{font-size:10px;color:#6b7280;margin-top:2px}
 .btn-gl{margin-left:auto;padding:6px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:9px;color:#c9a84c;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
 .btn-gl.open{background:rgba(201,168,76,0.22);border-color:rgba(201,168,76,0.5)}
 
-/* GL Panel */
-.gl-panel{position:relative;z-index:1;background:#0c1220;border-bottom:1px solid rgba(255,255,255,0.07);padding:16px 20px;max-height:60vh;overflow-y:auto;flex-shrink:0;display:none}
+/* ── カテゴリタブ ── */
+.cat-tabs{position:relative;z-index:1;display:flex;padding:10px 20px 0;gap:6px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.07);border-bottom:none;border-radius:8px 8px 0 0;color:#6b7280;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s;flex-shrink:0}
+.cat-tab.sel{color:#e8eaf0;font-weight:700;border-color:rgba(255,255,255,0.15)}
+.cat-tab[data-cat=“heart”].sel{background:rgba(232,69,69,0.15);color:#ff8080}
+.cat-tab[data-cat=“liver”].sel{background:rgba(74,190,120,0.15);color:#4cd964}
+.cat-tab[data-cat=“eye”].sel{background:rgba(100,180,255,0.15);color:#60b4ff}
+.cat-tab[data-cat=“infection”].sel{background:rgba(255,170,50,0.15);color:#ffaa32}
+
+/* ── GL Panel ── */
+.gl-panel{position:relative;z-index:1;background:#0c1220;border-bottom:1px solid rgba(255,255,255,0.07);padding:14px 20px;max-height:58vh;overflow-y:auto;flex-shrink:0;display:none}
 .gl-panel.open{display:block}
 .gl-panel-title{font-size:13px;font-weight:700;color:#c9a84c;margin-bottom:10px}
-
-/* GL行 */
-.gl-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:9px;margin-bottom:6px}
+.gl-row{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:9px;margin-bottom:5px}
 .gl-row-info{flex:1}
-.gl-name{font-size:12px;color:#e8eaf0}
-.gl-meta{font-size:10px;color:#6b7280;margin-top:2px}
-.badge{font-size:10px;padding:2px 8px;border-radius:5px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.gl-name{font-size:11px;color:#e8eaf0}
+.gl-meta{font-size:10px;color:#6b7280;margin-top:1px}
+.badge{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap;flex-shrink:0}
 .badge-wait{background:rgba(107,114,128,0.15);color:#6b7280;border:1px solid rgba(107,114,128,0.3)}
 .badge-ok{background:rgba(52,199,89,0.12);color:#4cd964;border:1px solid rgba(52,199,89,0.3)}
 .badge-upd{background:rgba(201,168,76,0.15);color:#c9a84c;border:1px solid rgba(201,168,76,0.3)}
-
-/* ボタン類 */
-.btn-gold{width:100%;padding:13px;background:linear-gradient(135deg,#c9a84c,#a07830);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
-.btn-red{width:100%;padding:13px;background:linear-gradient(135deg,#e84545,#c0392b);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
-.btn-red:disabled{background:#333;cursor:default}
-
-/* 貼り付けエリア */
-.paste-box{width:100%;min-height:90px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:11px;color:#e8eaf0;font-family:monospace;font-size:12px;padding:12px;resize:none;outline:none;margin-top:10px}
+.btn-gold{width:100%;padding:12px;background:linear-gradient(135deg,#c9a84c,#a07830);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.paste-box{width:100%;min-height:80px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8eaf0;font-family:monospace;font-size:12px;padding:10px;resize:none;outline:none;margin-top:8px}
 .paste-box:focus{border-color:rgba(201,168,76,0.45)}
-.paste-err{font-size:12px;color:#ff6b6b;margin-top:6px;min-height:18px}
-.copy-ok{font-size:11px;color:#4cd964;text-align:center;margin-top:6px;min-height:16px}
-.sec-divider{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)}
-.sec-mini-title{font-size:11px;font-weight:600;letter-spacing:.08em;color:#c9a84c;text-transform:uppercase;margin-bottom:8px}
-.note-txt{font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:8px}
+.btn-red{width:100%;padding:12px;background:linear-gradient(135deg,#e84545,#c0392b);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-red:disabled{background:#333;cursor:default}
+.msg-line{font-size:11px;text-align:center;margin-top:5px;min-height:16px;color:#4cd964}
+.err-line{font-size:11px;color:#ff6b6b;margin-top:5px;min-height:16px}
+.sec-div{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.sec-mini{font-size:11px;font-weight:600;letter-spacing:.08em;color:#c9a84c;text-transform:uppercase;margin-bottom:6px}
+.note-s{font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:6px}
 
-/* 通知バー */
-.notice-bar{position:relative;z-index:1;padding:9px 20px;background:rgba(201,168,76,0.1);border-bottom:1px solid rgba(201,168,76,0.25);font-size:12px;color:#c9a84c;cursor:pointer;display:none;align-items:center;gap:8px}
+/* ── Notice ── */
+.notice-bar{position:relative;z-index:1;padding:8px 20px;background:rgba(201,168,76,0.1);border-bottom:1px solid rgba(201,168,76,0.25);font-size:12px;color:#c9a84c;cursor:pointer;display:none;align-items:center;gap:8px}
 .notice-bar.show{display:flex}
 
-/* 入力画面 */
+/* ── 入力画面 ── */
 .screen-input{position:relative;z-index:1;flex:1;overflow-y:auto;padding:0 20px;display:block}
 .screen-input.hide{display:none}
-.field-label{font-size:10px;font-weight:600;letter-spacing:.1em;color:#c9a84c;text-transform:uppercase;margin-top:16px;margin-bottom:8px;display:block}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{background:#1a2235;border:1px solid rgba(255,255,255,0.07);color:#e8eaf0;font-size:13px;padding:6px 13px;border-radius:100px;cursor:pointer;white-space:nowrap;font-family:inherit}
-.chip.on{background:rgba(232,69,69,0.18);border-color:#e84545;color:#ff6b6b}
-.sym-input{width:100%;min-height:96px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:13px;color:#e8eaf0;font-family:inherit;font-size:14px;line-height:1.7;padding:14px;resize:none;outline:none;margin-top:6px;-webkit-appearance:none}
-.sym-input::placeholder{color:#6b7280}
-.sym-input:focus{border-color:rgba(232,69,69,0.4)}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.meta-card{background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px}
-.meta-label{font-size:10px;color:#c9a84c;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.field-label{font-size:10px;font-weight:600;letter-spacing:.1em;color:#9ca3af;text-transform:uppercase;margin-top:14px;margin-bottom:7px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#1a2235;border:1px solid rgba(255,255,255,0.07);color:#e8eaf0;font-size:12px;padding:5px 12px;border-radius:100px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s}
+/* カテゴリ別チップ色 */
+.chip[data-cat=“heart”].on{background:rgba(232,69,69,0.2);border-color:#e84545;color:#ff8080}
+.chip[data-cat=“liver”].on{background:rgba(52,199,89,0.2);border-color:#4cd964;color:#6deba0}
+.chip[data-cat=“eye”].on{background:rgba(96,180,255,0.2);border-color:#60b4ff;color:#90ccff}
+.chip[data-cat=“infection”].on{background:rgba(255,170,50,0.2);border-color:#ffaa32;color:#ffc870}
+.sym-input{width:100%;min-height:86px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:13px;color:#e8eaf0;font-family:inherit;font-size:14px;line-height:1.7;padding:13px;resize:none;outline:none;margin-top:5px;-webkit-appearance:none}
+.sym-input::placeholder{color:#4b5563}
+.sym-input:focus{border-color:rgba(74,124,247,0.45)}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.meta-card{background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px}
+.meta-label{font-size:10px;color:#c9a84c;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
 .meta-select{width:100%;background:transparent;border:none;color:#e8eaf0;font-family:inherit;font-size:13px;outline:none;-webkit-appearance:none;cursor:pointer}
 .meta-select option{background:#1a2235}
-.input-err{margin-top:10px;padding:10px 12px;background:rgba(232,69,69,.12);border:1px solid rgba(232,69,69,.3);border-radius:10px;font-size:13px;color:#ff6b6b;display:none}
-.btn-analyze{width:100%;padding:16px;margin-top:18px;background:linear-gradient(135deg,#e84545,#c0392b);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(232,69,69,0.3);-webkit-appearance:none}
-.disclaimer{margin:12px 0 20px;padding:10px 12px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:10px;font-size:11px;color:rgba(201,168,76,.75);line-height:1.6}
+.input-err{margin-top:8px;padding:9px 12px;background:rgba(232,69,69,.12);border:1px solid rgba(232,69,69,.3);border-radius:10px;font-size:13px;color:#ff6b6b;display:none}
+.btn-analyze{width:100%;padding:15px;margin-top:16px;background:linear-gradient(135deg,#4a7cf7,#2855c8);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(74,124,247,0.35);-webkit-appearance:none}
+.disclaimer{margin:10px 0 18px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;font-size:11px;color:#6b7280;line-height:1.6}
 
-/* ローディング */
+/* ── Loading ── */
 .screen-load{position:relative;z-index:1;flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
 .screen-load.show{display:flex}
 @keyframes ecg{0%{stroke-dashoffset:600;opacity:1}70%{stroke-dashoffset:0;opacity:1}90%{opacity:.3}100%{stroke-dashoffset:0;opacity:0}}
 @keyframes fadepulse{0%,100%{opacity:.4}50%{opacity:1}}
 .load-txt{font-size:14px;color:#6b7280;animation:fadepulse 1.5s ease-in-out infinite}
 
-/* 結果画面 */
+/* ── 結果画面 ── */
 .screen-result{position:relative;z-index:1;flex:1;overflow-y:auto;display:none}
 .screen-result.show{display:block}
-.result-hdr{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.result-hdr{padding:14px 20px 10px;border-bottom:1px solid rgba(255,255,255,0.07)}
 .result-hdr h2{font-size:17px;font-weight:700;margin-bottom:2px}
 .result-hdr p{font-size:11px;color:#6b7280}
-.urg-bar{margin:14px 20px 0;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500}
+.urg-bar{margin:12px 20px 0;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500}
 .urg-red{background:rgba(232,69,69,.15);border:1px solid rgba(232,69,69,.4);color:#ff8080}
 .urg-yellow{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:#d4a84b}
 .urg-green{background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.3);color:#4cd964}
-.emg-box{margin:12px 20px 0;padding:16px;background:rgba(232,69,69,.12);border:1px solid rgba(232,69,69,.4);border-radius:14px;text-align:center}
-.emg-box p{font-size:13px;color:#ff8080;margin-bottom:10px}
-.emg-box a{display:inline-block;background:#e84545;color:#fff;text-decoration:none;padding:10px 28px;border-radius:10px;font-size:16px;font-weight:700}
-.result-body{padding:0 20px 24px}
-.card{margin-top:14px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden}
-.card-head{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:8px}
+.emg-box{margin:10px 20px 0;padding:14px;background:rgba(232,69,69,.12);border:1px solid rgba(232,69,69,.4);border-radius:14px;text-align:center}
+.emg-box p{font-size:13px;color:#ff8080;margin-bottom:9px}
+.emg-box a{display:inline-block;background:#e84545;color:#fff;text-decoration:none;padding:9px 26px;border-radius:10px;font-size:15px;font-weight:700}
+.result-body{padding:0 20px 22px}
+.card{margin-top:12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden}
+.card-head{padding:11px 15px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:8px}
 .card-head strong{font-size:12px;font-weight:700;color:#c9a84c;letter-spacing:.06em}
-.card-body{padding:14px 16px;font-size:14px;line-height:1.8;color:#c8cdd8}
-.dis-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.card-body{padding:13px 15px;font-size:14px;line-height:1.8;color:#c8cdd8}
+.dis-row{display:flex;align-items:flex-start;gap:10px;padding:9px 15px;border-bottom:1px solid rgba(255,255,255,0.07)}
 .dis-row:last-child{border-bottom:none}
-.prob-box{min-width:40px;height:40px;border-radius:9px;background:rgba(232,69,69,.14);border:1px solid rgba(232,69,69,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#ff6b6b;flex-shrink:0;text-align:center;line-height:1.3}
-.dis-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.prob-box{min-width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;text-align:center;line-height:1.3}
+.prob-heart{background:rgba(232,69,69,.14);border:1px solid rgba(232,69,69,.3);color:#ff6b6b}
+.prob-liver{background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.3);color:#4cd964}
+.prob-eye{background:rgba(96,180,255,.12);border:1px solid rgba(96,180,255,.3);color:#60b4ff}
+.prob-infection{background:rgba(255,170,50,.12);border:1px solid rgba(255,170,50,.3);color:#ffaa32}
+.dis-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .dis-desc{font-size:12px;color:#6b7280;line-height:1.6}
-.adv-row{display:flex;align-items:flex-start;gap:10px;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;line-height:1.7}
+.adv-row{display:flex;align-items:flex-start;gap:9px;padding:7px 15px;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;line-height:1.7}
 .adv-row:last-child{border-bottom:none}
-.adv-num{min-width:20px;height:20px;border-radius:50%;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:#c9a84c;font-weight:700;flex-shrink:0;margin-top:3px}
-.ref-tag{display:inline-block;margin:2px 2px 2px 0;padding:2px 7px;border-radius:5px;font-size:10px;background:rgba(107,114,128,.18);color:#6b7280;border:1px solid rgba(107,114,128,.28)}
-.btn-back{display:block;margin:18px 20px 0;width:calc(100% - 40px);padding:13px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#e8eaf0;font-family:inherit;font-size:14px;cursor:pointer;-webkit-appearance:none}
+.adv-num{min-width:19px;height:19px;border-radius:50%;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:#c9a84c;font-weight:700;flex-shrink:0;margin-top:3px}
+.ref-tag{display:inline-block;margin:2px 2px 2px 0;padding:2px 6px;border-radius:5px;font-size:10px;background:rgba(107,114,128,.18);color:#6b7280;border:1px solid rgba(107,114,128,.28)}
+.cat-badge{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px;vertical-align:middle}
+.cat-heart{background:rgba(232,69,69,.2);color:#ff8080}
+.cat-liver{background:rgba(52,199,89,.2);color:#4cd964}
+.cat-eye{background:rgba(96,180,255,.2);color:#60b4ff}
+.cat-infection{background:rgba(255,170,50,.2);color:#ffaa32}
+.btn-back{display:block;margin:16px 20px 0;width:calc(100% - 40px);padding:12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#e8eaf0;font-family:inherit;font-size:14px;cursor:pointer;-webkit-appearance:none}
 </style>
 
 </head>
@@ -117,13 +134,23 @@ body{background:#0a0e1a;color:#e8eaf0;font-family:'Noto Sans JP',sans-serif;min-
   <!-- ヘッダー -->
 
   <header class="hdr">
-    <div class="hdr-icon">❤️</div>
+    <div class="hdr-icon">🩺</div>
     <div>
-      <div class="hdr-title">心臓・血管 症状チェッカー</div>
+      <div class="hdr-title">総合症状チェッカー</div>
       <div class="hdr-sub">公的ガイドライン準拠 診断支援</div>
     </div>
-    <button class="btn-gl" id="btnGl">📋 ガイドライン確認</button>
+    <button class="btn-gl" id="btnGl">📋 GL更新確認</button>
   </header>
+
+  <!-- カテゴリタブ -->
+
+  <div class="cat-tabs" id="catTabs">
+    <button class="cat-tab sel" data-cat="heart">❤️ 心臓・血管</button>
+    <button class="cat-tab" data-cat="liver">🫀 肝臓</button>
+    <button class="cat-tab" data-cat="eye">👁 目の疾患</button>
+    <button class="cat-tab" data-cat="infection">🦠 感染症</button>
+    <button class="cat-tab" data-cat="all">📋 全症状</button>
+  </div>
 
   <!-- 通知バー -->
 
@@ -135,39 +162,28 @@ body{background:#0a0e1a;color:#e8eaf0;font-family:'Noto Sans JP',sans-serif;min-
 
   <div class="gl-panel" id="glPanel">
     <div class="gl-panel-title">📋 ガイドライン更新チェック</div>
-
-```
-<!-- GL一覧 -->
-<div id="glList"></div>
-
-<!-- コピー＆Claude起動ボタン -->
-<button class="btn-gold" id="btnCopyOpen">📋 プロンプトをコピーして Claude で確認する</button>
-<div class="copy-ok" id="copyOk"></div>
-
-<!-- 貼り付けエリア -->
-<div class="sec-divider">
-  <div class="sec-mini-title">Claudeからの返答を貼り付けて反映</div>
-  <p class="note-txt">ClaudeからのJSONをそのまま貼り付けてください。</p>
-  <textarea class="paste-box" id="pasteBox" placeholder='{"results":[...]}'></textarea>
-  <div class="paste-err" id="pasteErr"></div>
-  <button class="btn-red" id="btnApply" disabled>✅ 結果を反映する</button>
-</div>
-
-<!-- 履歴 -->
-<div class="sec-divider">
-  <div class="sec-mini-title">チェック履歴</div>
-  <div id="glHistList"><p style="font-size:12px;color:#6b7280;text-align:center;padding:10px 0">チェック履歴がありません</p></div>
-</div>
-```
-
+    <div id="glList"></div>
+    <button class="btn-gold" id="btnCopyOpen">📋 プロンプトをコピーして Claude で確認する</button>
+    <div class="msg-line" id="copyOk"></div>
+    <div class="sec-div">
+      <div class="sec-mini">Claudeからの返答を貼り付けて反映</div>
+      <p class="note-s">ClaudeからのJSONをそのまま貼り付けてください。</p>
+      <textarea class="paste-box" id="pasteBox" placeholder='{"results":[...]}'></textarea>
+      <div class="err-line" id="pasteErr"></div>
+      <button class="btn-red" id="btnApply" disabled>✅ 結果を反映する</button>
+    </div>
+    <div class="sec-div">
+      <div class="sec-mini">チェック履歴</div>
+      <div id="glHistList"><p style="font-size:12px;color:#6b7280;text-align:center;padding:8px 0">チェック履歴がありません</p></div>
+    </div>
   </div>
 
   <!-- 症状入力 -->
 
   <div class="screen-input" id="screenInput">
-    <span class="field-label">よくある症状（複数選択可）</span>
+    <span class="field-label" id="chipLabel">心臓・血管の症状を選んでください</span>
     <div class="chips" id="chipsArea"></div>
-    <span class="field-label" style="margin-top:18px">詳しく教えてください</span>
+    <span class="field-label" style="margin-top:16px">詳しく教えてください（自由記述）</span>
     <textarea class="sym-input" id="symInput" placeholder="例：左胸が締め付けられるように痛く、左腕にしびれがあります。"></textarea>
     <div class="meta-grid">
       <div class="meta-card">
@@ -186,15 +202,15 @@ body{background:#0a0e1a;color:#e8eaf0;font-family:'Noto Sans JP',sans-serif;min-
     </div>
     <div class="input-err" id="inputErr">症状を選択または入力してください。</div>
     <button class="btn-analyze" id="btnAnalyze">症状を解析する</button>
-    <div class="disclaimer">⚠️ 厚生労働省・日本循環器学会等の公的ガイドラインに基づく情報提供です。医師の診断の代替ではありません。緊急時は直ちに119番へ。</div>
+    <div class="disclaimer">⚠️ 厚生労働省・日本循環器学会・日本肝臓学会・日本眼科学会・日本感染症学会等の公的ガイドラインに基づく情報提供です。医師による診断・治療の代替ではありません。緊急時は直ちに119番へ。</div>
   </div>
 
-  <!-- ローディング -->
+  <!-- Loading -->
 
   <div class="screen-load" id="screenLoad">
     <svg width="200" height="60" viewBox="0 0 200 60">
       <path d="M0,30 L30,30 L50,10 L60,50 L70,15 L80,30 L130,30 L150,10 L160,50 L170,15 L180,30 L200,30"
-        stroke="#e84545" stroke-width="2" fill="none"
+        stroke="#4a7cf7" stroke-width="2" fill="none"
         style="stroke-dasharray:600;stroke-dashoffset:600;animation:ecg 1.5s ease-out infinite"/>
     </svg>
     <div class="load-txt">ガイドラインを参照して解析中…</div>
@@ -206,469 +222,572 @@ body{background:#0a0e1a;color:#e8eaf0;font-family:'Noto Sans JP',sans-serif;min-
     <div class="result-hdr"><h2>解析結果</h2><p>公的ガイドライン準拠 症状解析</p></div>
     <div id="resultContent"></div>
     <button class="btn-back" id="btnBack">← もう一度入力する</button>
-    <div style="height:24px"></div>
+    <div style="height:22px"></div>
   </div>
 
-</div><!-- .app -->
-
+</div>
 <script>
 // ============================================================
-// 定数データ
+// ガイドラインデータ
 // ============================================================
 var GL_DATA = [
-  {id:"acs", name:"急性冠症候群ガイドライン",                     org:"日本循環器学会", year:2023},
-  {id:"cad", name:"慢性冠動脈疾患ガイドライン",                   org:"日本循環器学会", year:2023},
-  {id:"arr", name:"不整脈薬物治療ガイドライン",                   org:"日本循環器学会", year:2024},
-  {id:"hf",  name:"急性・慢性心不全診療ガイドライン",             org:"日本循環器学会", year:2025},
-  {id:"aod", name:"大動脈瘤・大動脈解離診療ガイドライン",         org:"日本循環器学会", year:2020},
-  {id:"htn", name:"高血圧管理・治療ガイドライン",                 org:"日本高血圧学会", year:2025},
-  {id:"pe",  name:"肺血栓塞栓症・深部静脈血栓症診療ガイドライン", org:"日本循環器学会", year:2025},
-  {id:"syn", name:"失神の診断・治療ガイドライン",                 org:"日本循環器学会", year:2022}
+  // 心臓・血管
+  {id:"acs",   name:"急性冠症候群ガイドライン",                      org:"日本循環器学会",           year:2023, cat:"heart"},
+  {id:"cad",   name:"慢性冠動脈疾患ガイドライン",                    org:"日本循環器学会",           year:2023, cat:"heart"},
+  {id:"arr",   name:"不整脈薬物治療ガイドライン",                    org:"日本循環器学会",           year:2024, cat:"heart"},
+  {id:"hf",    name:"急性・慢性心不全診療ガイドライン",              org:"日本循環器学会",           year:2025, cat:"heart"},
+  {id:"aod",   name:"大動脈瘤・大動脈解離診療ガイドライン",          org:"日本循環器学会",           year:2020, cat:"heart"},
+  {id:"htn",   name:"高血圧管理・治療ガイドライン",                  org:"日本高血圧学会",           year:2025, cat:"heart"},
+  {id:"pe",    name:"肺血栓塞栓症・深部静脈血栓症診療ガイドライン",  org:"日本循環器学会",           year:2025, cat:"heart"},
+  {id:"syn",   name:"失神の診断・治療ガイドライン",                  org:"日本循環器学会",           year:2022, cat:"heart"},
+  // 肝疾患
+  {id:"hbv",   name:"B型肝炎治療ガイドライン",                       org:"日本肝臓学会",             year:2023, cat:"liver"},
+  {id:"hcv",   name:"C型肝炎治療ガイドライン",                       org:"日本肝臓学会",             year:2023, cat:"liver"},
+  {id:"masld",  name:"脂肪性肝疾患（MASLD/MASH）診療ガイドライン",   org:"日本消化器病学会・日本肝臓学会", year:2023, cat:"liver"},
+  {id:"cirrh", name:"肝硬変診療ガイドライン",                        org:"日本消化器病学会・日本肝臓学会", year:2020, cat:"liver"},
+  // 目の疾患
+  {id:"glauc", name:"緑内障診療ガイドライン",                        org:"日本緑内障学会",           year:2022, cat:"eye"},
+  {id:"dret",  name:"糖尿病網膜症診療ガイドライン",                  org:"日本眼科学会",             year:2020, cat:"eye"},
+  {id:"amd",   name:"加齢黄斑変性診療ガイドライン",                  org:"日本眼科学会",             year:2023, cat:"eye"},
+  // 感染症
+  {id:"flu",   name:"インフルエンザ診療の手引き",                    org:"厚生労働省・日本感染症学会", year:2025, cat:"infection"},
+  {id:"covid", name:"新型コロナウイルス感染症診療の指針",            org:"日本感染症学会ほか5学会",   year:2025, cat:"infection"},
+  {id:"pneu",  name:"成人肺炎診療ガイドライン",                      org:"日本呼吸器学会",           year:2024, cat:"infection"},
+  {id:"tb",    name:"結核診療ガイドライン",                          org:"日本結核・非結核性抗酸菌症学会", year:2024, cat:"infection"},
+  {id:"myco",  name:"マイコプラズマ感染症対策指針",                  org:"日本感染症学会・日本呼吸器学会ほか", year:2024, cat:"infection"},
+  {id:"pertus",name:"百日咳診療ガイドライン（2025年追補版）",        org:"日本小児呼吸器学会・日本小児感染症学会", year:2025, cat:"infection"}
 ];
-
-var DISEASE_DATA = [
-  {id:"ami",    name:"急性心筋梗塞",                     kw:["胸の痛み・圧迫感","胸のしめつけ","左腕のしびれ","急な冷や汗","吐き気","顔面蒼白","背中の痛み","頸部・顎の痛み"], minMatch:2, urgLv:"emergency", boost:3, desc:"冠動脈が完全に閉塞し心筋が壊死する緊急疾患です。強い圧迫感・しめつけ感が典型的で、左腕・顎への放散痛、冷汗・吐き気を伴う場合は特に危険です。", glId:"acs"},
-  {id:"angina", name:"狭心症",                           kw:["胸の痛み・圧迫感","胸のしめつけ","左腕のしびれ","息切れ","頸部・顎の痛み"],                                      minMatch:2, urgLv:"soon",      boost:2, desc:"冠動脈の狭窄で心筋への血流が一時的に不足する状態です。労作時の胸の圧迫感・しめつけ感が特徴で、安静にすると数分で治まります。",                         glId:"cad"},
-  {id:"arr",    name:"不整脈（心房細動・頻脈性不整脈）", kw:["動悸・不整脈","息切れ","めまい・ふらつき","失神・意識消失","胸の痛み・圧迫感"],                                  minMatch:1, urgLv:"soon",      boost:2, desc:"心臓のリズムが乱れる状態です。動悸・ドキドキ感が主症状で、脳梗塞リスクにもなる心房細動は特に注意が必要です。",                                        glId:"arr"},
-  {id:"hf",     name:"心不全",                           kw:["息切れ","呼吸困難","足のむくみ","動悸・不整脈","めまい・ふらつき"],                                              minMatch:2, urgLv:"soon",      boost:1, desc:"心臓のポンプ機能が低下し全身への循環が不十分になる状態です。労作時の息切れ・両足のむくみ・横になると息苦しいなどが典型的です。",                       glId:"hf"},
-  {id:"aod",    name:"大動脈解離",                       kw:["背中の痛み","胸の痛み・圧迫感","急な冷や汗","顔面蒼白","めまい・ふらつき","失神・意識消失"],                     minMatch:2, urgLv:"emergency", boost:2, desc:"大動脈の内膜が裂ける緊急疾患です。「引き裂かれるような」激しい胸部・背部痛が突然起こるのが特徴です。直ちに救急要請してください。",                   glId:"aod"},
-  {id:"htn",    name:"高血圧症・高血圧緊急症",           kw:["頭痛","めまい・ふらつき","動悸・不整脈","息切れ","顔面蒼白"],                                                   minMatch:2, urgLv:"soon",      boost:1, desc:"血圧が慢性的に高い状態です。著しく上昇する「高血圧緊急症」では脳・心臓・腎臓への障害リスクがあり、速やかな受診が必要です。",                          glId:"htn"},
-  {id:"pe",     name:"肺塞栓症（エコノミークラス症候群）",kw:["呼吸困難","息切れ","胸の痛み・圧迫感","急な冷や汗","失神・意識消失","動悸・不整脈"],                            minMatch:2, urgLv:"emergency", boost:1, desc:"肺の血管に血栓が詰まる緊急疾患です。突然の息切れ・胸痛が特徴的で、長時間安静後に起こりやすいです。",                                               glId:"pe"},
-  {id:"vvs",    name:"血管迷走神経反射（迷走神経性失神）",kw:["失神・意識消失","めまい・ふらつき","顔面蒼白","吐き気","急な冷や汗"],                                           minMatch:2, urgLv:"monitor",   boost:1, desc:"強いストレス・長時間立位・脱水などで迷走神経が過剰反応し、一時的に血圧・心拍数が低下して失神する状態です。多くは数分で自然回復します。",             glId:"syn"},
-  {id:"func",   name:"機能性動悸・自律神経失調症",        kw:["動悸・不整脈","息切れ","めまい・ふらつき","頭痛"],                                                              minMatch:2, urgLv:"monitor",   boost:0, desc:"過労・ストレス・睡眠不足などによる自律神経の乱れが原因で動悸・息切れが起こることがあります。症状が続く場合は受診をお勧めします。",                    glId:"arr"}
-];
-
-var CHIP_NAMES = ["胸の痛み・圧迫感","胸のしめつけ","左腕のしびれ","動悸・不整脈","息切れ","呼吸困難","急な冷や汗","めまい・ふらつき","顔面蒼白","足のむくみ","失神・意識消失","頭痛","頸部・顎の痛み","背中の痛み","吐き気"];
-var EMGKW = ["失神・意識消失","顔面蒼白","急な冷や汗","呼吸困難"];
 
 // ============================================================
-// アプリ状態（window.* と衝突しない名前を使用）
+// 疾患データベース
+// ============================================================
+var DISEASE_DATA = [
+// ── 心臓・血管 ──
+{id:“ami”,      cat:“heart”,     name:“急性心筋梗塞”,
+kw:[“胸の痛み・圧迫感”,“胸のしめつけ”,“左腕のしびれ”,“急な冷や汗”,“吐き気”,“顔面蒼白”,“背中の痛み”,“頸部・顎の痛み”],
+minMatch:2, urgLv:“emergency”, boost:3,
+desc:“冠動脈が完全に閉塞し心筋が壊死する緊急疾患です。強い圧迫感・しめつけ感が典型的で、左腕・顎への放散痛や冷汗・吐き気を伴う場合は特に危険です。”, glId:“acs”},
+{id:“angina”,   cat:“heart”,     name:“狭心症”,
+kw:[“胸の痛み・圧迫感”,“胸のしめつけ”,“左腕のしびれ”,“息切れ”,“頸部・顎の痛み”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“冠動脈の狭窄で心筋への血流が一時的に不足する状態です。労作時の胸の圧迫感・しめつけ感が特徴で、安静にすると数分で治まります。”, glId:“cad”},
+{id:“arr”,      cat:“heart”,     name:“不整脈（心房細動・頻脈性不整脈）”,
+kw:[“動悸・不整脈”,“息切れ”,“めまい・ふらつき”,“失神・意識消失”,“胸の痛み・圧迫感”],
+minMatch:1, urgLv:“soon”, boost:2,
+desc:“心臓のリズムが乱れる状態です。動悸・ドキドキ感が主症状で、脳梗塞リスクにもなる心房細動は特に注意が必要です。”, glId:“arr”},
+{id:“hf”,       cat:“heart”,     name:“心不全”,
+kw:[“息切れ”,“呼吸困難”,“足のむくみ”,“動悸・不整脈”,“めまい・ふらつき”],
+minMatch:2, urgLv:“soon”, boost:1,
+desc:“心臓のポンプ機能が低下し全身への循環が不十分になる状態です。労作時の息切れ・両足のむくみ・横になると息苦しいなどが典型的です。”, glId:“hf”},
+{id:“aod”,      cat:“heart”,     name:“大動脈解離”,
+kw:[“背中の痛み”,“胸の痛み・圧迫感”,“急な冷や汗”,“顔面蒼白”,“めまい・ふらつき”,“失神・意識消失”],
+minMatch:2, urgLv:“emergency”, boost:2,
+desc:“大動脈の内膜が裂ける緊急疾患です。「引き裂かれるような」激しい胸部・背部痛が突然起こるのが特徴です。直ちに救急要請してください。”, glId:“aod”},
+{id:“htn”,      cat:“heart”,     name:“高血圧症・高血圧緊急症”,
+kw:[“頭痛”,“めまい・ふらつき”,“動悸・不整脈”,“息切れ”,“顔面蒼白”],
+minMatch:2, urgLv:“soon”, boost:1,
+desc:“血圧が慢性的に高い状態です。著しく上昇する「高血圧緊急症」では脳・心臓・腎臓への障害リスクがあり、速やかな受診が必要です。”, glId:“htn”},
+{id:“pe”,       cat:“heart”,     name:“肺塞栓症（エコノミークラス症候群）”,
+kw:[“呼吸困難”,“息切れ”,“胸の痛み・圧迫感”,“急な冷や汗”,“失神・意識消失”,“動悸・不整脈”],
+minMatch:2, urgLv:“emergency”, boost:1,
+desc:“肺の血管に血栓が詰まる緊急疾患です。突然の息切れ・胸痛が特徴的で、長時間安静後に起こりやすいです。”, glId:“pe”},
+{id:“vvs”,      cat:“heart”,     name:“血管迷走神経反射（迷走神経性失神）”,
+kw:[“失神・意識消失”,“めまい・ふらつき”,“顔面蒼白”,“吐き気”,“急な冷や汗”],
+minMatch:2, urgLv:“monitor”, boost:1,
+desc:“強いストレス・長時間立位・脱水などで迷走神経が過剰反応し、一時的に血圧・心拍数が低下して失神する状態です。多くは数分で自然回復します。”, glId:“syn”},
+// ── 肝疾患 ──
+{id:“hepatitis”, cat:“liver”,    name:“ウイルス性肝炎（B型・C型）”,
+kw:[“黄疸・皮膚の黄色化”,“全身倦怠感・だるさ”,“食欲不振・吐き気”,“右脇腹の重さ・痛み”,“発熱”,“尿の色が濃い”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“B型・C型肝炎ウイルスによる肝臓の炎症です。全身倦怠感・食欲不振・黄疸が主症状で、慢性化すると肝硬変・肝がんへ進行するリスクがあります。定期的な血液検査と専門医受診が重要です。”, glId:“hbv”},
+{id:“masld”,     cat:“liver”,    name:“脂肪肝・代謝機能障害関連脂肪性肝疾患（MASLD）”,
+kw:[“右脇腹の重さ・痛み”,“全身倦怠感・だるさ”,“食欲不振・吐き気”],
+minMatch:1, urgLv:“monitor”, boost:1,
+desc:“肥満・糖尿病・脂質異常症などを背景に肝臓に脂肪が蓄積する状態です。多くは無症状ですが、一部はMASH（脂肪肝炎）・肝硬変へ進行します。食事・運動療法による生活習慣改善が基本治療です。”, glId:“masld”},
+{id:“cirrhosis”, cat:“liver”,    name:“肝硬変”,
+kw:[“黄疸・皮膚の黄色化”,“腹部膨満（腹水）”,“全身倦怠感・だるさ”,“足のむくみ”,“意識の変容・混乱（肝性脳症）”,“消化管出血（黒色便）”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“慢性肝疾患の終末像で、肝臓が線維化・硬化した状態です。腹水・黄疸・食道静脈瘤出血・肝性脳症などの合併症が生じます。黒色便・意識障害は緊急受診が必要です。”, glId:“cirrh”},
+{id:“acute_liver”,cat:“liver”,   name:“急性肝不全・劇症肝炎”,
+kw:[“黄疸・皮膚の黄色化”,“意識の変容・混乱（肝性脳症）”,“全身倦怠感・だるさ”,“発熱”,“食欲不振・吐き気”],
+minMatch:2, urgLv:“emergency”, boost:3,
+desc:“肝細胞が急速に壊死する緊急疾患です。黄疸・意識障害・凝固異常が急速に進行します。疑いがある場合は直ちに救急受診が必要です。”, glId:“hbv”},
+// ── 目の疾患 ──
+{id:“glaucoma”,  cat:“eye”,      name:“緑内障”,
+kw:[“視野の欠け・狭まり”,“頭痛”,“目の痛み・充血”,“吐き気”,“視力の低下”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“眼圧上昇などにより視神経が障害され視野が失われる疾患です。日本の失明原因第1位で初期は自覚症状が乏しいため定期検査が重要です。急性緑内障発作では激しい頭痛・目の痛み・嘔気が起こり緊急治療が必要です。”, glId:“glauc”},
+{id:“diabret”,   cat:“eye”,      name:“糖尿病網膜症”,
+kw:[“視力の低下”,“視野の欠け・狭まり”,“飛蚊症（目の前に浮遊物）”],
+minMatch:1, urgLv:“soon”, boost:2,
+desc:“糖尿病による網膜血管の障害で、日本の成人失明原因第2位です。初期は自覚症状がなく進行するため、糖尿病患者は年1回以上の眼底検査が推奨されます。突然の視力低下は硝子体出血の可能性があり早急な受診が必要です。”, glId:“dret”},
+{id:“amd”,       cat:“eye”,      name:“加齢黄斑変性”,
+kw:[“視力の低下”,“視野の中心が歪む・暗い”,“飛蚊症（目の前に浮遊物）”],
+minMatch:2, urgLv:“soon”, boost:1,
+desc:“加齢により黄斑が障害される疾患で、中心部が歪んで見える・暗くなるのが特徴です。早期発見・早期治療が視力維持に重要です。”, glId:“amd”},
+{id:“cataract”,  cat:“eye”,      name:“白内障”,
+kw:[“視力の低下”,“まぶしさ・光のにじみ”,“かすみ目”],
+minMatch:2, urgLv:“monitor”, boost:1,
+desc:“水晶体が濁る疾患で加齢が主な原因です。視力低下・まぶしさ・かすみが主症状で、手術により回復できます。急激な視力低下は他の疾患の可能性があり早期受診が必要です。”, glId:“dret”},
+// ── 感染症 ──
+{id:“influenza”,  cat:“infection”, name:“インフルエンザ”,
+kw:[“発熱（38℃以上の高熱）”,“全身倦怠感・だるさ”,“筋肉痛・関節痛”,“頭痛”,“咳・鼻水・のどの痛み”,“悪寒・震え”],
+minMatch:3, urgLv:“soon”, boost:2,
+desc:“インフルエンザウイルスによる急性呼吸器感染症です。38℃以上の急な発熱・全身倦怠感・筋肉痛が特徴です。発症48時間以内の抗インフルエンザ薬が有効です。高齢者・基礎疾患のある方は重症化リスクがあります。”, glId:“flu”},
+{id:“covid19”,    cat:“infection”, name:“新型コロナウイルス感染症（COVID-19）”,
+kw:[“発熱（38℃以上の高熱）”,“咳・鼻水・のどの痛み”,“全身倦怠感・だるさ”,“息切れ”,“嗅覚・味覚の異常”,“頭痛”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“SARS-CoV-2による感染症です。発熱・咳・倦怠感が主症状で、嗅覚・味覚異常が特徴的です。呼吸困難・SpO2低下・意識障害は緊急受診が必要です。高齢者・基礎疾患のある方は早めの受診を。”, glId:“covid”},
+{id:“pneumonia”,  cat:“infection”, name:“肺炎（細菌性・ウイルス性）”,
+kw:[“発熱（38℃以上の高熱）”,“咳・鼻水・のどの痛み”,“息切れ”,“全身倦怠感・だるさ”,“胸の痛み・圧迫感”],
+minMatch:3, urgLv:“soon”, boost:2,
+desc:“細菌・ウイルスなどによる肺の炎症です。発熱・咳・呼吸困難が主症状です。SpO2低下・意識障害・急速な呼吸困難悪化は緊急受診が必要です。”, glId:“pneu”},
+{id:“mycoplasma”, cat:“infection”, name:“マイコプラズマ肺炎”,
+kw:[“咳・鼻水・のどの痛み”,“発熱（38℃以上の高熱）”,“全身倦怠感・だるさ”,“頭痛”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“マイコプラズマによる非定型肺炎で、頑固な咳が数週間続くのが特徴です。聴診所見が乏しく見逃されやすいです。βラクタム系抗菌薬は無効でマクロライド系薬が有効ですが、近年耐性菌が増加しています。”, glId:“myco”},
+{id:“tuberculosis”,cat:“infection”,name:“肺結核”,
+kw:[“咳・鼻水・のどの痛み”,“発熱（38℃以上の高熱）”,“全身倦怠感・だるさ”,“体重減少・食欲不振”,“血痰・喀血”],
+minMatch:2, urgLv:“soon”, boost:2,
+desc:“結核菌による慢性感染症です。2週間以上続く咳・微熱・体重減少・血痰が特徴的です。早期診断・治療と感染拡大防止が重要です。疑いがある場合は呼吸器科・感染症科を受診してください。”, glId:“tb”},
+{id:“pertussis”,  cat:“infection”, name:“百日咳”,
+kw:[“咳・鼻水・のどの痛み”,“発作性の激しい咳”,“全身倦怠感・だるさ”],
+minMatch:2, urgLv:“soon”, boost:1,
+desc:“百日咳菌による急性気道感染症で、発作性の激しい咳（ヒューという吸気音）が特徴です。2025年に国内で急増しており注意が必要です。近年マクロライド耐性菌が報告されています。”, glId:“pertus”},
+{id:“common_cold”,cat:“infection”, name:“かぜ症候群”,
+kw:[“咳・鼻水・のどの痛み”,“発熱（38℃以上の高熱）”,“頭痛”,“全身倦怠感・だるさ”],
+minMatch:2, urgLv:“monitor”, boost:0,
+desc:“ウイルスによる上気道炎です。鼻水・のどの痛み・軽度の発熱が主症状で通常1週間程度で自然回復します。高熱が続く・呼吸困難・症状が1週間以上続く場合は受診が必要です。”, glId:“flu”}
+];
+
+// カテゴリ別チップ定義
+var CHIP_DEF = {
+heart:     [“胸の痛み・圧迫感”,“胸のしめつけ”,“左腕のしびれ”,“動悸・不整脈”,“息切れ”,“呼吸困難”,“急な冷や汗”,“めまい・ふらつき”,“顔面蒼白”,“足のむくみ”,“失神・意識消失”,“背中の痛み”,“頸部・顎の痛み”],
+liver:     [“黄疸・皮膚の黄色化”,“右脇腹の重さ・痛み”,“腹部膨満（腹水）”,“全身倦怠感・だるさ”,“食欲不振・吐き気”,“尿の色が濃い”,“意識の変容・混乱（肝性脳症）”,“消化管出血（黒色便）”,“発熱”],
+eye:       [“視力の低下”,“視野の欠け・狭まり”,“目の痛み・充血”,“視野の中心が歪む・暗い”,“飛蚊症（目の前に浮遊物）”,“まぶしさ・光のにじみ”,“かすみ目”,“頭痛”,“吐き気”],
+infection: [“発熱（38℃以上の高熱）”,“咳・鼻水・のどの痛み”,“全身倦怠感・だるさ”,“筋肉痛・関節痛”,“悪寒・震え”,“嗅覚・味覚の異常”,“息切れ”,“頭痛”,“体重減少・食欲不振”,“血痰・喀血”,“発作性の激しい咳”]
+};
+
+// 全チップ（全カテゴリ表示用・重複除去）
+var ALL_CHIPS = [];
+(function(){
+var seen = {};
+[“heart”,“liver”,“eye”,“infection”].forEach(function(cat){
+CHIP_DEF[cat].forEach(function(c){
+if(!seen[c]){ seen[c]=cat; ALL_CHIPS.push({name:c,cat:cat}); }
+});
+});
+})();
+
+var CAT_LABELS = {
+heart:     “心臓・血管の症状を選んでください”,
+liver:     “肝臓の症状を選んでください”,
+eye:       “目の症状を選んでください”,
+infection: “感染症の症状を選んでください”,
+all:       “すべての症状から選んでください”
+};
+
+var EMGKW = [“失神・意識消失”,“顔面蒼白”,“急な冷や汗”,“呼吸困難”,“意識の変容・混乱（肝性脳症）”,“消化管出血（黒色便）”];
+
+// ============================================================
+// アプリ状態
 // ============================================================
 var appState = {
-  selectedChips: {},   // チップ選択状態
-  glCheckLog:    [],   // ガイドライン確認履歴（historyは予約語なので使わない）
-  glPanelOpen:   false
+selectedChips: {},
+currentCat:    “heart”,
+glCheckLog:    [],
+glPanelOpen:   false
 };
 
 // ============================================================
-// 初期化（DOMContentLoaded 後に実行）
+// 初期化
 // ============================================================
-window.addEventListener('DOMContentLoaded', function() {
-  initChips();
-  initGlList();
-  // イベント登録
-  document.getElementById('btnGl').addEventListener('click', toggleGlPanel);
-  document.getElementById('btnCopyOpen').addEventListener('click', doCopyAndOpen);
-  document.getElementById('btnApply').addEventListener('click', doApplyPaste);
-  document.getElementById('pasteBox').addEventListener('input', function() {
-    document.getElementById('btnApply').disabled = !this.value.trim();
-  });
-  document.getElementById('btnAnalyze').addEventListener('click', doAnalyze);
-  document.getElementById('btnBack').addEventListener('click', doBack);
-  document.getElementById('noticeBar').addEventListener('click', function() {
-    openGlPanel();
-  });
+window.addEventListener(‘DOMContentLoaded’, function() {
+initGlList();
+renderChips(“heart”);
+
+// カテゴリタブ
+document.getElementById(‘catTabs’).addEventListener(‘click’, function(e) {
+var btn = e.target.closest(’.cat-tab’);
+if (!btn) return;
+document.querySelectorAll(’.cat-tab’).forEach(function(b){ b.classList.remove(‘sel’); });
+btn.classList.add(‘sel’);
+var cat = btn.getAttribute(‘data-cat’);
+appState.currentCat = cat;
+renderChips(cat);
+document.getElementById(‘chipLabel’).textContent = CAT_LABELS[cat] || “”;
+});
+
+document.getElementById(‘btnGl’).addEventListener(‘click’, toggleGlPanel);
+document.getElementById(‘btnCopyOpen’).addEventListener(‘click’, doCopyAndOpen);
+document.getElementById(‘btnApply’).addEventListener(‘click’, doApplyPaste);
+document.getElementById(‘pasteBox’).addEventListener(‘input’, function(){
+document.getElementById(‘btnApply’).disabled = !this.value.trim();
+});
+document.getElementById(‘btnAnalyze’).addEventListener(‘click’, doAnalyze);
+document.getElementById(‘btnBack’).addEventListener(‘click’, doBack);
+document.getElementById(‘noticeBar’).addEventListener(‘click’, openGlPanel);
 });
 
 // ============================================================
-// チップ初期化
+// チップ描画
 // ============================================================
-function initChips() {
-  var area = document.getElementById('chipsArea');
-  CHIP_NAMES.forEach(function(name) {
-    var btn = document.createElement('button');
-    btn.className = 'chip';
-    btn.textContent = name;
-    btn.addEventListener('click', function() {
-      if (appState.selectedChips[name]) {
-        delete appState.selectedChips[name];
-        btn.classList.remove('on');
-      } else {
-        appState.selectedChips[name] = true;
-        btn.classList.add('on');
-      }
-    });
-    area.appendChild(btn);
-  });
+function renderChips(cat) {
+var area = document.getElementById(‘chipsArea’);
+area.innerHTML = ‘’;
+var list = (cat === ‘all’) ? ALL_CHIPS : CHIP_DEF[cat].map(function(n){ return {name:n,cat:cat}; });
+list.forEach(function(item) {
+var btn = document.createElement(‘button’);
+btn.className = ‘chip’ + (appState.selectedChips[item.name] ? ’ on’ : ‘’);
+btn.setAttribute(‘data-cat’, item.cat);
+btn.textContent = item.name;
+btn.addEventListener(‘click’, function() {
+if (appState.selectedChips[item.name]) {
+delete appState.selectedChips[item.name];
+btn.classList.remove(‘on’);
+} else {
+appState.selectedChips[item.name] = true;
+btn.classList.add(‘on’);
+}
+});
+area.appendChild(btn);
+});
 }
 
 // ============================================================
-// ガイドライン一覧初期化
+// GL一覧
 // ============================================================
 function initGlList() {
-  var el = document.getElementById('glList');
-  el.innerHTML = '';
-  GL_DATA.forEach(function(g) {
-    var row = document.createElement('div');
-    row.className = 'gl-row';
-    row.innerHTML =
-      '<div class="gl-row-info">'
-      + '<div class="gl-name">' + g.name + '</div>'
-      + '<div class="gl-meta">' + g.org + ' ・ 記録: ' + g.year + '年版</div>'
-      + '</div>'
-      + '<span class="badge badge-wait" id="glBadge-' + g.id + '">未確認</span>';
-    el.appendChild(row);
-  });
+var el = document.getElementById(‘glList’);
+var catNames = {heart:“心臓・血管”, liver:“肝臓”, eye:“目の疾患”, infection:“感染症”};
+var prevCat = ‘’;
+GL_DATA.forEach(function(g) {
+if (g.cat !== prevCat) {
+el.innerHTML += ‘<div style="font-size:10px;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px">’ + catNames[g.cat] + ‘</div>’;
+prevCat = g.cat;
+}
+el.innerHTML += ‘<div class="gl-row">’
++ ‘<div class="gl-row-info"><div class="gl-name">’ + g.name + ‘</div>’
++ ‘<div class="gl-meta">’ + g.org + ’ ・ ’ + g.year + ‘年版</div></div>’
++ ‘<span class="badge badge-wait" id="glBadge-' + g.id + '">未確認</span></div>’;
+});
 }
 
 // ============================================================
-// GL パネル開閉
+// GLパネル開閉
 // ============================================================
 function toggleGlPanel() {
-  if (appState.glPanelOpen) {
-    closeGlPanel();
-  } else {
-    openGlPanel();
-  }
+appState.glPanelOpen ? closeGlPanel() : openGlPanel();
 }
 function openGlPanel() {
-  appState.glPanelOpen = true;
-  document.getElementById('glPanel').classList.add('open');
-  document.getElementById('btnGl').classList.add('open');
+appState.glPanelOpen = true;
+document.getElementById(‘glPanel’).classList.add(‘open’);
+document.getElementById(‘btnGl’).classList.add(‘open’);
 }
 function closeGlPanel() {
-  appState.glPanelOpen = false;
-  document.getElementById('glPanel').classList.remove('open');
-  document.getElementById('btnGl').classList.remove('open');
+appState.glPanelOpen = false;
+document.getElementById(‘glPanel’).classList.remove(‘open’);
+document.getElementById(‘btnGl’).classList.remove(‘open’);
 }
 
 // ============================================================
 // プロンプト生成
 // ============================================================
 function buildPromptText() {
-  var list = GL_DATA.map(function(g) {
-    return '・' + g.name + '（' + g.org + '、現在アプリに記録されている年版: ' + g.year + '年）';
-  }).join('\n');
-  var tmpl = GL_DATA.map(function(g) {
-    return '{"id":"' + g.id + '","latest_year":' + g.year + ',"updated":false,"summary":"変更なし"}';
-  }).join(',');
-  return '以下の医療ガイドラインについて、各学会の公式Webサイトを検索し最新版の年を確認してください。\n\n'
-    + list + '\n\n'
-    + '記録の年より新しい版がある場合はupdated:trueにしてください。\n'
-    + '以下のJSON形式のみで回答してください（前置き・マークダウン不要）：\n\n'
-    + '{"results":[' + tmpl + ']}';
+var list = GL_DATA.map(function(g){
+return ‘・’ + g.name + ‘（’ + g.org + ‘、現在アプリに記録されている年版: ’ + g.year + ‘年）’;
+}).join(’\n’);
+var tmpl = GL_DATA.map(function(g){
+return ‘{“id”:”’ + g.id + ‘”,“latest_year”:’ + g.year + ‘,“updated”:false,“summary”:“変更なし”}’;
+}).join(’,’);
+return ‘以下の医療ガイドラインについて、各学会の公式Webサイトを検索し最新版の年を確認してください。\n\n’
++ list + ‘\n\n’
++ ‘記録の年より新しい版がある場合はupdated:trueにしてください。\n’
++ ‘以下のJSON形式のみで回答してください（前置き・マークダウン不要）：\n\n’
++ ‘{“results”:[’ + tmpl + ‘]}’;
 }
 
 // ============================================================
 // コピー＆Claude起動
 // ============================================================
 function doCopyAndOpen() {
-  var txt = buildPromptText();
-  var statusEl = document.getElementById('copyOk');
-
-  function onCopied() {
-    statusEl.textContent = '✅ コピーしました！Claudeに貼り付けて送信してください。';
-    setTimeout(function() { statusEl.textContent = ''; }, 5000);
-  }
-
-  // クリップボードコピー
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(txt).then(onCopied).catch(function() {
-      fallbackCopy(txt, onCopied);
-    });
-  } else {
-    fallbackCopy(txt, onCopied);
-  }
-
-  // Claudeを新タブで開く
-  window.open('https://claude.ai/new', '_blank');
+var txt = buildPromptText();
+var okEl = document.getElementById(‘copyOk’);
+function onCopied() {
+okEl.textContent = ‘✅ コピーしました！Claudeに貼り付けて送信してください。’;
+setTimeout(function(){ okEl.textContent = ‘’; }, 5000);
 }
-
-function fallbackCopy(txt, callback) {
-  var ta = document.createElement('textarea');
-  ta.value = txt;
-  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  try {
-    document.execCommand('copy');
-    if (callback) callback();
-  } catch (e) {
-    document.getElementById('copyOk').textContent = '⚠️ 手動でコピーしてください。';
-  }
-  document.body.removeChild(ta);
+if (navigator.clipboard && window.isSecureContext) {
+navigator.clipboard.writeText(txt).then(onCopied).catch(function(){ fallbackCopy(txt, onCopied); });
+} else {
+fallbackCopy(txt, onCopied);
+}
+window.open(‘https://claude.ai/new’, ‘_blank’);
+}
+function fallbackCopy(txt, cb) {
+var ta = document.createElement(‘textarea’);
+ta.value = txt;
+ta.style.cssText = ‘position:fixed;left:-9999px;top:-9999px;opacity:0’;
+document.body.appendChild(ta);
+ta.focus(); ta.select();
+try { document.execCommand(‘copy’); if(cb) cb(); }
+catch(e){ document.getElementById(‘copyOk’).textContent = ‘⚠️ 手動でコピーしてください。’; }
+document.body.removeChild(ta);
 }
 
 // ============================================================
 // 貼り付け反映
 // ============================================================
 function doApplyPaste() {
-  var raw = document.getElementById('pasteBox').value.trim();
-  var errEl = document.getElementById('pasteErr');
-  errEl.textContent = '';
+var raw = document.getElementById(‘pasteBox’).value.trim();
+var errEl = document.getElementById(‘pasteErr’);
+errEl.textContent = ‘’;
+// 全角文字を半角に変換
+var fixed = ‘’;
+for (var i = 0; i < raw.length; i++) {
+var code = raw.charCodeAt(i);
+if      (code===0x201c||code===0x201d||code===0x2033||code===0xff02) fixed+=’”’;
+else if (code===0xff1a) fixed+=’:’;
+else if (code===0xff0c) fixed+=’,’;
+else if (code===0xff5b) fixed+=’{’;
+else if (code===0xff5d) fixed+=’}’;
+else fixed+=raw[i];
+}
+var match = fixed.match(/{[\s\S]*}/);
+if (!match) { errEl.textContent = ‘エラー: JSONが見つかりません’; return; }
+var data;
+try { data = JSON.parse(match[0]); }
+catch(e) { errEl.textContent = ‘エラー: JSONの形式が正しくありません (’ + e.message + ‘)’; return; }
+if (!data.results || !Array.isArray(data.results)) { errEl.textContent = ‘エラー: results配列が見つかりません’; return; }
 
-  // 全角引用符等を半角に変換
-  var fixed = '';
-  for (var i = 0; i < raw.length; i++) {
-    var code = raw.charCodeAt(i);
-    if (code === 0x201c || code === 0x201d || code === 0x2033 || code === 0xff02) {
-      fixed += '"';
-    } else if (code === 0xff1a) {
-      fixed += ':';
-    } else if (code === 0xff0c) {
-      fixed += ',';
-    } else if (code === 0xff5b) {
-      fixed += '{';
-    } else if (code === 0xff5d) {
-      fixed += '}';
-    } else {
-      fixed += raw[i];
-    }
-  }
-
-  // JSON抽出・パース
-  var match = fixed.match(/\{[\s\S]*\}/);
-  if (!match) { errEl.textContent = 'エラー: JSONが見つかりません'; return; }
-
-  var data;
-  try {
-    data = JSON.parse(match[0]);
-  } catch (e) {
-    errEl.textContent = 'エラー: JSONの形式が正しくありません (' + e.message + ')';
-    return;
-  }
-
-  if (!data.results || !Array.isArray(data.results)) {
-    errEl.textContent = 'エラー: results配列が見つかりません';
-    return;
-  }
-
-  // バッジ更新・通知
-  var hasUpdate = false;
-  data.results.forEach(function(r) {
-    var badge = document.getElementById('glBadge-' + r.id);
-    if (badge) {
-      if (r.updated) {
-        badge.className = 'badge badge-upd';
-        badge.textContent = '🟡 更新あり';
-        hasUpdate = true;
-      } else {
-        badge.className = 'badge badge-ok';
-        badge.textContent = '✅ 最新';
-      }
-    }
-  });
-
-  if (hasUpdate) {
-    document.getElementById('noticeBar').classList.add('show');
-  }
-
-  // 履歴保存
-  saveGlLog(data.results);
-
-  // 入力クリア
-  document.getElementById('pasteBox').value = '';
-  document.getElementById('btnApply').disabled = true;
-  errEl.textContent = '';
-  document.getElementById('copyOk').textContent = '✅ 反映しました！';
-  setTimeout(function() { document.getElementById('copyOk').textContent = ''; }, 4000);
+var hasUpdate = false;
+data.results.forEach(function(r) {
+var badge = document.getElementById(‘glBadge-’ + r.id);
+if (badge) {
+if (r.updated) { badge.className=‘badge badge-upd’; badge.textContent=‘🟡 更新あり’; hasUpdate=true; }
+else           { badge.className=‘badge badge-ok’;  badge.textContent=‘✅ 最新’; }
+}
+});
+if (hasUpdate) { document.getElementById(‘noticeBar’).classList.add(‘show’); }
+saveGlLog(data.results);
+document.getElementById(‘pasteBox’).value = ‘’;
+document.getElementById(‘btnApply’).disabled = true;
+document.getElementById(‘copyOk’).textContent = ‘✅ 反映しました！’;
+setTimeout(function(){ document.getElementById(‘copyOk’).textContent = ‘’; }, 4000);
 }
 
 // ============================================================
-// 履歴保存・表示
+// 履歴
 // ============================================================
 function saveGlLog(results) {
-  var now = new Date().toLocaleString('ja-JP');
-  var updated = results.filter(function(r) { return r.updated; });
-  appState.glCheckLog.unshift({ date: now, updated: updated, all: results });
-  if (appState.glCheckLog.length > 5) appState.glCheckLog.length = 5;
-  renderGlLog();
+var now = new Date().toLocaleString(‘ja-JP’);
+var updated = results.filter(function(r){ return r.updated; });
+appState.glCheckLog.unshift({date:now, updated:updated, all:results});
+if (appState.glCheckLog.length > 5) appState.glCheckLog.length = 5;
+renderGlLog();
 }
-
 function renderGlLog() {
-  var el = document.getElementById('glHistList');
-  if (!appState.glCheckLog.length) {
-    el.innerHTML = '<p style="font-size:12px;color:#6b7280;text-align:center;padding:10px 0">チェック履歴がありません</p>';
-    return;
-  }
-  el.innerHTML = appState.glCheckLog.map(function(entry) {
-    var updHtml = entry.updated.length
-      ? '<div style="font-size:12px;color:#c9a84c;margin-top:3px">🟡 更新あり（' + entry.updated.length + '件）</div>'
-        + entry.updated.map(function(r) {
-            var g = GL_DATA.find(function(x) { return x.id === r.id; });
-            return '<div style="font-size:11px;color:#c9a84c;margin-top:2px">・' + (g ? g.name : r.id) + '</div>';
-          }).join('')
-      : '<div style="font-size:12px;color:#4cd964;margin-top:3px">✅ すべて最新版</div>';
-    return '<div style="margin-bottom:8px;padding:10px 12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:10px">'
-      + '<div style="font-size:11px;color:#6b7280">🕐 ' + entry.date + '</div>'
-      + updHtml + '</div>';
-  }).join('');
+var el = document.getElementById(‘glHistList’);
+if (!appState.glCheckLog.length) {
+el.innerHTML = ‘<p style="font-size:12px;color:#6b7280;text-align:center;padding:8px 0">チェック履歴がありません</p>’;
+return;
+}
+el.innerHTML = appState.glCheckLog.map(function(entry) {
+var updHtml = entry.updated.length
+? ‘<div style="font-size:12px;color:#c9a84c;margin-top:3px">🟡 更新あり（’ + entry.updated.length + ‘件）</div>’
++ entry.updated.map(function(r){
+var g = GL_DATA.find(function(x){ return x.id===r.id; });
+return ‘<div style="font-size:11px;color:#c9a84c;margin-top:1px">・’ + (g?g.name:r.id) + ‘</div>’;
+}).join(’’)
+: ‘<div style="font-size:12px;color:#4cd964;margin-top:3px">✅ すべて最新版</div>’;
+return ‘<div style="margin-bottom:7px;padding:9px 12px;background:#1a2235;border:1px solid rgba(255,255,255,0.07);border-radius:10px">’
++ ‘<div style="font-size:11px;color:#6b7280">🕐 ’ + entry.date + ‘</div>’ + updHtml + ‘</div>’;
+}).join(’’);
 }
 
 // ============================================================
 // 症状解析
 // ============================================================
 function doAnalyze() {
-  var txt = document.getElementById('symInput').value.trim();
-  var chips = Object.keys(appState.selectedChips);
-  var errEl = document.getElementById('inputErr');
-
-  if (!txt && !chips.length) {
-    errEl.style.display = 'block';
-    return;
-  }
-  errEl.style.display = 'none';
-
-  // ローディング表示
-  document.getElementById('screenInput').classList.add('hide');
-  document.getElementById('screenLoad').classList.add('show');
-
-  setTimeout(function() {
-    var dur = document.getElementById('selectDur').value;
-    var sev = document.getElementById('selectSev').value;
-    var res = calcAnalysis(chips, txt, dur, sev);
-    renderAnalysisResult(res);
-    document.getElementById('screenLoad').classList.remove('show');
-    document.getElementById('screenResult').classList.add('show');
-  }, 1200);
+var txt = document.getElementById(‘symInput’).value.trim();
+var chips = Object.keys(appState.selectedChips);
+var errEl = document.getElementById(‘inputErr’);
+if (!txt && !chips.length) { errEl.style.display=‘block’; return; }
+errEl.style.display = ‘none’;
+document.getElementById(‘screenInput’).classList.add(‘hide’);
+document.getElementById(‘screenLoad’).classList.add(‘show’);
+setTimeout(function(){
+var dur = document.getElementById(‘selectDur’).value;
+var sev = document.getElementById(‘selectSev’).value;
+var res = calcAnalysis(chips, txt, dur, sev);
+renderAnalysisResult(res);
+document.getElementById(‘screenLoad’).classList.remove(‘show’);
+document.getElementById(‘screenResult’).classList.add(‘show’);
+}, 1200);
 }
-
 function doBack() {
-  document.getElementById('screenResult').classList.remove('show');
-  document.getElementById('screenInput').classList.remove('hide');
+document.getElementById(‘screenResult’).classList.remove(‘show’);
+document.getElementById(‘screenInput’).classList.remove(‘hide’);
 }
 
 // ============================================================
 // 解析ロジック
 // ============================================================
 function calcAnalysis(chips, txt, dur, sev) {
-  // テキストからキーワード抽出
-  var textKw = [];
-  if (/胸|むね/.test(txt))         textKw.push("胸の痛み・圧迫感");
-  if (/しびれ|痺れ/.test(txt))     textKw.push("左腕のしびれ");
-  if (/動悸|ドキドキ/.test(txt))   textKw.push("動悸・不整脈");
-  if (/息|呼吸|苦し/.test(txt))    textKw.push("息切れ");
-  if (/むくみ|浮腫/.test(txt))     textKw.push("足のむくみ");
-  if (/冷や汗|冷汗/.test(txt))     textKw.push("急な冷や汗");
-  if (/めまい|ふらつき/.test(txt))  textKw.push("めまい・ふらつき");
-  if (/失神|意識/.test(txt))       textKw.push("失神・意識消失");
-  if (/背中|背部/.test(txt))       textKw.push("背中の痛み");
-  if (/頭痛/.test(txt))            textKw.push("頭痛");
+// テキストからキーワード抽出
+var textKw = [];
+if (/胸|むね/.test(txt))             textKw.push(“胸の痛み・圧迫感”);
+if (/しびれ|痺れ/.test(txt))         textKw.push(“左腕のしびれ”);
+if (/動悸|ドキドキ/.test(txt))       textKw.push(“動悸・不整脈”);
+if (/息切れ|息苦/.test(txt))         textKw.push(“息切れ”);
+if (/呼吸困難|呼吸が苦/.test(txt))   textKw.push(“呼吸困難”);
+if (/むくみ|浮腫/.test(txt))         textKw.push(“足のむくみ”);
+if (/冷や汗|冷汗/.test(txt))         textKw.push(“急な冷や汗”);
+if (/めまい|ふらつき/.test(txt))      textKw.push(“めまい・ふらつき”);
+if (/失神|意識消失/.test(txt))       textKw.push(“失神・意識消失”);
+if (/背中|背部/.test(txt))           textKw.push(“背中の痛み”);
+if (/頭痛/.test(txt))               textKw.push(“頭痛”);
+if (/黄疸|黄色/.test(txt))          textKw.push(“黄疸・皮膚の黄色化”);
+if (/右脇腹|肝臓/.test(txt))        textKw.push(“右脇腹の重さ・痛み”);
+if (/腹水|腹が張/.test(txt))        textKw.push(“腹部膨満（腹水）”);
+if (/黒色便|タール便|下血/.test(txt)) textKw.push(“消化管出血（黒色便）”);
+if (/視力|見えにく/.test(txt))       textKw.push(“視力の低下”);
+if (/視野/.test(txt))               textKw.push(“視野の欠け・狭まり”);
+if (/目が痛|充血/.test(txt))         textKw.push(“目の痛み・充血”);
+if (/歪|中心が/.test(txt))          textKw.push(“視野の中心が歪む・暗い”);
+if (/飛蚊/.test(txt))               textKw.push(“飛蚊症（目の前に浮遊物）”);
+if (/かすみ|霞/.test(txt))          textKw.push(“かすみ目”);
+if (/発熱|高熱|熱が/.test(txt))      textKw.push(“発熱（38℃以上の高熱）”);
+if (/咳|鼻水|のど|喉/.test(txt))     textKw.push(“咳・鼻水・のどの痛み”);
+if (/倦怠|だるい|だるさ/.test(txt))  textKw.push(“全身倦怠感・だるさ”);
+if (/筋肉痛|関節痛/.test(txt))      textKw.push(“筋肉痛・関節痛”);
+if (/悪寒|寒気|震え/.test(txt))      textKw.push(“悪寒・震え”);
+if (/嗅覚|味覚/.test(txt))          textKw.push(“嗅覚・味覚の異常”);
+if (/血痰|喀血/.test(txt))          textKw.push(“血痰・喀血”);
+if (/体重減少|食欲不振/.test(txt))   textKw.push(“体重減少・食欲不振”);
 
-  // 重複除去
-  var allKw = chips.slice();
-  textKw.forEach(function(k) {
-    if (allKw.indexOf(k) < 0) allKw.push(k);
-  });
+var allKw = chips.slice();
+textKw.forEach(function(k){ if(allKw.indexOf(k)<0) allKw.push(k); });
 
-  var hasEmg  = allKw.some(function(s) { return EMGKW.indexOf(s) >= 0; });
-  var isStrong = sev === "非常に強い" || sev === "強い";
-  var isSudden = dur === "突然" || dur === "数分以内";
+var hasEmg   = allKw.some(function(s){ return EMGKW.indexOf(s)>=0; });
+var isStrong = sev===“非常に強い”||sev===“強い”;
+var isSudden = dur===“突然”||dur===“数分以内”;
 
-  // スコアリング
-  var scored = DISEASE_DATA.map(function(d) {
-    var mc = allKw.filter(function(s) { return d.kw.indexOf(s) >= 0; }).length;
-    return { d: d, mc: mc, score: mc + d.boost };
-  }).filter(function(x) {
-    return x.mc >= x.d.minMatch;
-  }).sort(function(a, b) {
-    return b.score - a.score;
-  }).slice(0, 4);
+var scored = DISEASE_DATA.map(function(d){
+var mc = allKw.filter(function(s){ return d.kw.indexOf(s)>=0; }).length;
+return {d:d, mc:mc, score:mc+d.boost};
+}).filter(function(x){ return x.mc>=x.d.minMatch; })
+.sort(function(a,b){ return b.score-a.score; })
+.slice(0,5);
 
-  // 緊急度
-  var urgLv = scored.length ? scored[0].d.urgLv : "monitor";
-  if (urgLv === "emergency" && !(hasEmg || (isStrong && isSudden))) urgLv = "soon";
-  if (hasEmg && isStrong && isSudden) urgLv = "emergency";
+var urgLv = scored.length ? scored[0].d.urgLv : “monitor”;
+if (urgLv===“emergency” && !(hasEmg||(isStrong&&isSudden))) urgLv=“soon”;
+if (hasEmg&&isStrong&&isSudden) urgLv=“emergency”;
 
-  var conditions = scored.map(function(x, i) {
-    var glObj = GL_DATA.find(function(g) { return g.id === x.d.glId; });
-    return {
-      name:   x.d.name,
-      lh:     ["高","中","低"][i] || "低",
-      desc:   x.d.desc,
-      glRef:  glObj ? glObj.name + "（" + glObj.org + " " + glObj.year + "年版）" : ""
-    };
-  });
+var conditions = scored.map(function(x,i){
+var glObj = GL_DATA.find(function(g){ return g.id===x.d.glId; });
+return {
+name:  x.d.name,
+cat:   x.d.cat,
+lh:    [“高”,“中”,“低”,“低”,“低”][i]||“低”,
+desc:  x.d.desc,
+glRef: glObj ? glObj.name+”（”+glObj.org+” “+glObj.year+“年版）” : “”
+};
+});
 
-  var sl = allKw.join("・") || "入力された症状";
-  var bodyState = conditions.length
-    ? "現在、" + sl + "の症状が" + dur + "から" + sev + "の強さで続いています。「" + conditions[0].name + "」などの可能性があり、医療的な評価が推奨されます。"
-    : "入力された症状（" + sl + "）について、心疾患・血管疾患との明確な関連は見つかりませんでしたが、症状が続く場合は医療機関への相談をお勧めします。";
+var sl = allKw.join(”・”) || “入力された症状”;
+var bodyState = conditions.length
+? “現在、”+sl+“の症状が”+dur+“から”+sev+“の強さで続いています。「”+conditions[0].name+”」などの可能性があり、医療的な評価が推奨されます。”
+: “入力された症状（”+sl+”）について、登録されているガイドライン疾患との明確な関連は見つかりませんでしたが、症状が続く場合は医療機関への相談をお勧めします。”;
 
-  var advice = urgLv === "emergency"
-    ? ["今すぐ119番に電話し救急車を要請してください。自分で運転しないでください。","安静にして楽な姿勢（半座位）を保ってください。","衣服を緩め呼吸を楽にしてください。"]
-    : urgLv === "soon"
-    ? ["本日中〜翌日中に循環器科または内科を受診してください。","症状が急に悪化した場合はすぐに119番を呼んでください。","安静を保ち激しい運動・飲酒・喫煙は控えてください。","受診時に症状の始まった時刻・強さ・経過を医師に伝えてください。"]
-    : ["症状が1〜2週間以上続く・悪化する場合は内科・循環器科を受診してください。","塩分・脂肪分を控えたバランスの良い食事を心がけてください。","禁煙・節酒を実践してください。","ウォーキング30分/日などの有酸素運動を習慣化してください。","十分な睡眠とストレス管理を行ってください。","定期的な血圧・血糖・コレステロールの測定をお勧めします。"];
+var advice = urgLv===“emergency”
+?[“今すぐ119番に電話し救急車を要請してください。自分で運転しないでください。”,“安静にして楽な姿勢を保ってください。”,“衣服を緩め呼吸を楽にしてください。”]
+:urgLv===“soon”
+?[“症状に応じた適切な診療科（循環器科・消化器科・眼科・感染症科など）を本日中〜翌日中に受診してください。”,“症状が急に悪化した場合はすぐに119番を呼んでください。”,“安静を保ち激しい運動・飲酒・喫煙は控えてください。”,“受診時に症状の始まった時刻・強さ・経過を医師に伝えてください。”]
+:[“症状が1〜2週間以上続く・悪化する場合は適切な診療科を受診してください。”,“バランスの良い食事・適度な運動・十分な睡眠を心がけてください。”,“禁煙・節酒を実践してください。”,“定期的な健康診断を受けてください。”,“手洗い・うがいなど基本的な感染予防を徹底してください。”];
 
-  var urgMsg = {
-    emergency: "⚠️ 緊急性が高い症状です。直ちに119番へ連絡してください。",
-    soon:      "早めの受診が必要な症状です。本日〜翌日中に循環器科を受診してください。",
-    monitor:   "経過観察が推奨されます。症状が続く・悪化する場合は医療機関を受診してください。"
-  };
+var urgMsg = {
+emergency: “⚠️ 緊急性が高い症状です。直ちに119番へ連絡してください。”,
+soon:      “早めの受診が必要な症状です。本日〜翌日中に医療機関を受診してください。”,
+monitor:   “経過観察が推奨されます。症状が続く・悪化する場合は医療機関を受診してください。”
+};
 
-  // 参照ガイドライン（重複除去）
-  var refNames = [];
-  scored.forEach(function(x) {
-    var glObj = GL_DATA.find(function(g) { return g.id === x.d.glId; });
-    if (glObj && refNames.indexOf(glObj.name) < 0) refNames.push(glObj.name);
-  });
-  refNames.push("厚生労働省 健康日本21（第三次）");
+var refNames = [];
+scored.forEach(function(x){
+var g = GL_DATA.find(function(gl){ return gl.id===x.d.glId; });
+if(g && refNames.indexOf(g.name)<0) refNames.push(g.name);
+});
+refNames.push(“厚生労働省 健康日本21（第三次）”);
 
-  return { urgLv: urgLv, urgMsg: urgMsg[urgLv], conditions: conditions, bodyState: bodyState, advice: advice, refNames: refNames,
-    call119: "以下の場合は直ちに119番へ：①激しい胸痛・圧迫感が続く ②意識を失った・失いそう ③呼吸困難が急に起きた ④突然の激しい背部痛・頭痛 ⑤顔・手足の片側の麻痺" };
+return {urgLv:urgLv, urgMsg:urgMsg[urgLv], conditions:conditions, bodyState:bodyState,
+advice:advice, refNames:refNames,
+call119:“以下の場合は直ちに119番へ：①激しい胸痛・圧迫感 ②意識消失・意識障害 ③急激な呼吸困難 ④突然の激しい背部痛 ⑤黄疸＋意識障害 ⑥顔・手足の片側麻痺”};
 }
 
 // ============================================================
 // 結果描画
 // ============================================================
 function renderAnalysisResult(r) {
-  var urgClass = { emergency: "urg-red", soon: "urg-yellow", monitor: "urg-green" };
-  var urgIcon  = { emergency: "🚨", soon: "⚠️", monitor: "✅" };
+var urgClass = {emergency:“urg-red”, soon:“urg-yellow”, monitor:“urg-green”};
+var urgIcon  = {emergency:“🚨”, soon:“⚠️”, monitor:“✅”};
+var catLabelMap = {heart:“心臓・血管”, liver:“肝臓”, eye:“目の疾患”, infection:“感染症”};
 
-  var h = '<div class="urg-bar ' + urgClass[r.urgLv] + '">'
-    + '<span style="font-size:20px">' + urgIcon[r.urgLv] + '</span>'
-    + '<span>' + r.urgMsg + '</span></div>';
+var h = ‘<div class="urg-bar '+urgClass[r.urgLv]+'">’
++ ‘<span style="font-size:20px">’+urgIcon[r.urgLv]+’</span>’
++ ‘<span>’+r.urgMsg+’</span></div>’;
 
-  if (r.urgLv === "emergency") {
-    h += '<div class="emg-box"><p>今すぐ救急車を呼んでください</p><a href="tel:119">📞 119番に電話する</a></div>';
-  }
+if (r.urgLv===“emergency”) {
+h += ‘<div class="emg-box"><p>今すぐ救急車を呼んでください</p><a href="tel:119">📞 119番に電話する</a></div>’;
+}
 
-  h += '<div class="result-body">';
+h += ‘<div class="result-body">’;
 
-  // 体の状態
-  h += '<div class="card"><div class="card-head"><span>🫀</span><strong>現在の体の状態</strong></div>'
-    + '<div class="card-body">' + r.bodyState + '</div></div>';
+// 体の状態
+h += ‘<div class="card"><div class="card-head"><span>🔎</span><strong>現在の体の状態</strong></div>’
++ ‘<div class="card-body">’+r.bodyState+’</div></div>’;
 
-  // 疾患
-  if (r.conditions.length) {
-    h += '<div class="card"><div class="card-head"><span>🔍</span><strong>考えられる疾患・状態</strong></div>';
-    r.conditions.forEach(function(c) {
-      h += '<div class="dis-row">'
-        + '<div class="prob-box">可能性<br>' + c.lh + '</div>'
-        + '<div><div class="dis-name">' + c.name + '</div>'
-        + '<div class="dis-desc">' + c.desc + '</div>'
-        + (c.glRef ? '<span class="ref-tag">📋 ' + c.glRef + '</span>' : '')
-        + '</div></div>';
-    });
-    h += '</div>';
-  }
+// 疾患
+if (r.conditions.length) {
+h += ‘<div class="card"><div class="card-head"><span>📋</span><strong>考えられる疾患・状態</strong></div>’;
+r.conditions.forEach(function(c){
+var probCls = ‘prob-’+c.cat;
+var catCls  = ‘cat-’+c.cat;
+h += ‘<div class="dis-row">’
++ ‘<div class="prob-box '+probCls+'">可能性<br>’+c.lh+’</div>’
++ ‘<div><div class="dis-name">’+c.name
++ ‘<span class="cat-badge '+catCls+'">’+catLabelMap[c.cat]+’</span></div>’
++ ‘<div class="dis-desc">’+c.desc+’</div>’
++ (c.glRef?’<span class="ref-tag">📋 ‘+c.glRef+’</span>’:’’)
++ ‘</div></div>’;
+});
+h += ‘</div>’;
+}
 
-  // アドバイス
-  if (r.advice.length) {
-    h += '<div class="card"><div class="card-head"><span>💡</span><strong>改善・対処のアドバイス</strong></div>';
-    r.advice.forEach(function(a, i) {
-      h += '<div class="adv-row"><span class="adv-num">' + (i+1) + '</span><span>' + a + '</span></div>';
-    });
-    h += '</div>';
-  }
+// アドバイス
+if (r.advice.length) {
+h += ‘<div class="card"><div class="card-head"><span>💡</span><strong>改善・対処のアドバイス</strong></div>’;
+r.advice.forEach(function(a,i){
+h += ‘<div class="adv-row"><span class="adv-num">’+(i+1)+’</span><span>’+a+’</span></div>’;
+});
+h += ‘</div>’;
+}
 
-  // 119の目安
-  h += '<div class="card"><div class="card-head"><span>🚑</span><strong>119番・受診の目安</strong></div>'
-    + '<div class="card-body">' + r.call119 + '</div></div>';
+// 119の目安
+h += ‘<div class="card"><div class="card-head"><span>🚑</span><strong>119番・受診の目安</strong></div>’
++ ‘<div class="card-body">’+r.call119+’</div></div>’;
 
-  // 参照ガイドライン
-  if (r.refNames.length) {
-    h += '<div class="card"><div class="card-head"><span>📚</span><strong>参照ガイドライン</strong></div><div style="padding:10px 16px">';
-    r.refNames.forEach(function(name) { h += '<span class="ref-tag">📋 ' + name + '</span>'; });
-    h += '</div></div>';
-  }
+// 参照ガイドライン
+if (r.refNames.length) {
+h += ‘<div class="card"><div class="card-head"><span>📚</span><strong>参照ガイドライン</strong></div>’
++ ‘<div style="padding:10px 15px">’;
+r.refNames.forEach(function(name){ h+=’<span class="ref-tag">📋 ‘+name+’</span>’; });
+h += ‘</div></div>’;
+}
 
-  h += '<div class="disclaimer" style="margin-top:14px">本結果は教育目的の情報提供であり、医師による診断・治療の代替ではありません。症状が続く場合は必ず医療機関を受診してください。</div>';
-  h += '</div>';
+h += ‘<div class="disclaimer" style="margin-top:12px">本結果は教育目的の情報提供であり、医師による診断・治療の代替ではありません。症状が続く場合は必ず医療機関を受診してください。</div>’;
+h += ‘</div>’;
 
-  document.getElementById('resultContent').innerHTML = h;
+document.getElementById(‘resultContent’).innerHTML = h;
 }
 </script>
 

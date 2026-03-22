@@ -560,14 +560,31 @@ conditions は最大4件。advice は最大6件。urgency="emergency"は即時11
       })
     });
 
+    if (!response.ok) {
+      const errBody = await response.text();
+      throw new Error(`API Error ${response.status}: ${errBody}`);
+    }
+
     const data = await response.json();
     const rawText = (data.content || []).map(b => b.text || '').join('');
+
     let parsed;
     try {
-      const clean = rawText.replace(/```json|```/g, '').trim();
-      parsed = JSON.parse(clean);
+      // JSON部分を正規表現で抽出してからパース
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('JSONが見つかりません');
+      parsed = JSON.parse(jsonMatch[0]);
     } catch (e) {
-      throw new Error('解析結果のパースに失敗しました。');
+      // パース失敗時はフォールバック結果を表示
+      parsed = {
+        urgency: 'monitor',
+        urgency_message: '解析結果を取得しましたが、構造化に問題がありました。以下に内容を表示します。',
+        conditions: [],
+        body_state: rawText || '結果を取得できませんでした。',
+        advice: ['症状が続く場合は医療機関を受診してください。'],
+        when_to_call_119: '症状が急激に悪化した場合や、激しい胸痛・意識消失がある場合はすぐに119番へ。',
+        references: []
+      };
     }
 
     renderResult(parsed);
@@ -575,7 +592,7 @@ conditions は最大4件。advice は最大6件。urgency="emergency"は即時11
 
   } catch (err) {
     showScreen('input-screen');
-    alert('エラーが発生しました: ' + err.message);
+    alert('エラーが発生しました:\n' + err.message);
   }
 }
 
